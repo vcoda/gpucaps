@@ -260,20 +260,18 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice,
 void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
-    const VkQueueFlagBits flags[] = {
-        VK_QUEUE_GRAPHICS_BIT,
-        VK_QUEUE_COMPUTE_BIT,
-        VK_QUEUE_TRANSFER_BIT,
-        VK_QUEUE_SPARSE_BINDING_BIT,
-        VK_QUEUE_PROTECTED_BIT
-    };
     const auto& queueFamilyProperties = physicalDevice->getQueueFamilyProperties();
     uint32_t queueFamilyIndex = 0;
     for (const auto& properties : queueFamilyProperties)
     {
         cout << endl << "#" << queueFamilyIndex << endl << endl;
         cout << "Queue flags";
-        for (auto bit : flags)
+        for (const auto bit : {
+            VK_QUEUE_GRAPHICS_BIT,
+            VK_QUEUE_COMPUTE_BIT,
+            VK_QUEUE_TRANSFER_BIT,
+            VK_QUEUE_SPARSE_BINDING_BIT,
+            VK_QUEUE_PROTECTED_BIT})
         {
             if (properties.queueFlags & bit)
             {
@@ -299,15 +297,6 @@ void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice,
 
 void printDeviceMemoryTypes(magma::PhysicalDevicePtr physicalDevice)
 {
-    const VkMemoryPropertyFlagBits memoryFlags[] =
-    {
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
-        VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT,
-        VK_MEMORY_PROPERTY_PROTECTED_BIT
-    };
     const auto& properties = physicalDevice->getMemoryProperties();
     for (uint32_t i = 0; i < properties.memoryTypeCount; ++i)
     {
@@ -316,7 +305,13 @@ void printDeviceMemoryTypes(magma::PhysicalDevicePtr physicalDevice)
         cout << "#" << i << endl << endl;
         cout << "Properties";
         bool hasFlags = false;
-        for (auto bit : memoryFlags)
+        for (const auto bit : {
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+            VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+            VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT,
+            VK_MEMORY_PROPERTY_PROTECTED_BIT})
         {
             if (memoryType.propertyFlags & bit)
             {
@@ -337,12 +332,6 @@ void printDeviceMemoryTypes(magma::PhysicalDevicePtr physicalDevice)
 
 void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
 {
-    const VkMemoryHeapFlagBits heapFlags[] =
-    {
-        VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,
-        VK_MEMORY_HEAP_MULTI_INSTANCE_BIT,
-        VK_MEMORY_HEAP_MULTI_INSTANCE_BIT_KHR
-    };
     const auto& properties = physicalDevice->getMemoryProperties();
     for (uint32_t i = 0; i < properties.memoryHeapCount; ++i)
     {
@@ -352,7 +341,10 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
         cout << "Heap size " << memoryHeap.size << endl;
         cout << "Heap flags";
         bool hasFlags = false;
-        for (auto bit : heapFlags)
+        for (const auto bit : {
+            VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,
+            VK_MEMORY_HEAP_MULTI_INSTANCE_BIT,
+            VK_MEMORY_HEAP_MULTI_INSTANCE_BIT_KHR})
         {
             if (memoryHeap.flags & bit)
             {
