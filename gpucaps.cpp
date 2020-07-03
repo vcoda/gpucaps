@@ -386,6 +386,18 @@ void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
     cout << setw(width) << left << "VGPR allocation granularity" << properties.vgprAllocationGranularity << endl;
 }
 
+void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
+    std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_AMD_shader_core_properties2
+    const auto& properties = physicalDevice->getShaderCoreProperties2();
+    cout << endl;
+    cout << setw(width) << left << "Active compute unit count" << properties.activeComputeUnitCount << endl;
+#endif
+}
+
 void printExtensions(std::shared_ptr<magma::Extensions> extensions,
     std::streamsize width)
 {
@@ -455,6 +467,8 @@ int main()
         {
             cout << endl << "==================== Shader Core Properties ====================" << endl;
             printShaderCoreProperties(physicalDevice, 35);
+            if (deviceExtensions->AMD_shader_core_properties2)
+                printExtendedShaderCoreProperties(physicalDevice, 35);
         }
         cout << endl << "==================== Device Extensions ====================" << endl;
         printExtensions(deviceExtensions, 45);
