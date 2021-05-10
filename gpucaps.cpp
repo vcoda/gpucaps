@@ -412,11 +412,14 @@ void printExtensions(std::shared_ptr<magma::Extensions> extensions,
 
 magma::InstancePtr createInstance()
 {
-    const std::vector<const char *> layerNames = {
+    std::vector<const char*> layerNames;
 #ifdef _DEBUG
-        "VK_LAYER_LUNARG_standard_validation"
-#endif
-    };
+    std::unique_ptr<magma::InstanceLayers> instanceLayers = std::make_unique<magma::InstanceLayers>();
+    if (instanceLayers->KHRONOS_validation)
+        layerNames.push_back("VK_LAYER_KHRONOS_validation");
+    else if (instanceLayers->LUNARG_standard_validation)
+        layerNames.push_back("VK_LAYER_LUNARG_standard_validation");
+#endif // _DEBUG
     auto instanceExtensions = std::make_unique<magma::InstanceExtensions>();
     std::vector<const char *> extensions = {
 #ifdef VK_USE_PLATFORM_WIN32_KHR
