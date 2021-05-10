@@ -436,7 +436,7 @@ magma::InstancePtr createInstance()
 int main()
 {
     cout << "Vulkan GPU Caps Viewer [Version 1.1]" << endl;
-    cout << "(c) 2018-2020 Victor Coda." << endl;
+    cout << "(c) 2018-2021 Victor Coda." << endl;
 
     auto instance = createInstance();
     if (!instance)
