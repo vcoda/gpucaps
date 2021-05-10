@@ -343,8 +343,7 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
         bool hasFlags = false;
         for (const auto bit : {
             VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,
-            VK_MEMORY_HEAP_MULTI_INSTANCE_BIT,
-            VK_MEMORY_HEAP_MULTI_INSTANCE_BIT_KHR})
+            VK_MEMORY_HEAP_MULTI_INSTANCE_BIT})
         {
             if (memoryHeap.flags & bit)
             {
