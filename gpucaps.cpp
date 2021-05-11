@@ -452,6 +452,25 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice,
 #endif // VK_NV_mesh_shader
 }
 
+void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice,
+    std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_NV_ray_tracing
+    const auto& properties = physicalDevice->getRayTracingProperties();
+    cout << endl;
+    cout << setw(width) << left << "Shader group handle size" << properties.shaderGroupHandleSize << endl;
+    cout << setw(width) << left << "Max recursion depth" << properties.maxRecursionDepth << endl;
+    cout << setw(width) << left << "Max shader group stride" << properties.maxShaderGroupStride << endl;
+    cout << setw(width) << left << "Shader group base alignment" << properties.shaderGroupBaseAlignment << endl;
+    cout << setw(width) << left << "Max geometry count" << properties.maxGeometryCount << endl;
+    cout << setw(width) << left << "Max instance count" << properties.maxInstanceCount << endl;
+    cout << setw(width) << left << "Max triangle count" << properties.maxTriangleCount << endl;
+    cout << setw(width) << left << "Max descriptor set acceleration structures" << properties.maxDescriptorSetAccelerationStructures << endl;
+#endif // VK_NV_ray_tracing
+}
+
 void printExtensions(std::shared_ptr<magma::Extensions> extensions,
     std::streamsize width)
 {
@@ -534,8 +553,13 @@ int main()
         }
         if (deviceExtensions->NV_mesh_shader)
         {
-            cout << endl << "==================== Mesh shader Properties ====================" << endl;
+            cout << endl << "==================== Mesh Shader Properties ====================" << endl;
             printMeshShaderProperties(physicalDevice, 40);
+        }
+        if (deviceExtensions->NV_ray_tracing)
+        {
+            cout << endl << "==================== Ray Tracing Properties ====================" << endl;
+            printRayTracingProperties(physicalDevice, 45);
         }
         cout << endl << "==================== Device Extensions ====================" << endl;
         printExtensions(deviceExtensions, 45);
