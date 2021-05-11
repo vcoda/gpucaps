@@ -364,6 +364,9 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
 void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
+    physicalDevice;
+    width;
+#ifdef VK_AMD_shader_core_properties
     const auto& properties = physicalDevice->getShaderCoreProperties();
     cout << endl;
     cout << setw(width) << left << "Shader engine count" << properties.shaderEngineCount << endl;
@@ -383,6 +386,7 @@ void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
     cout << setw(width) << left << "Min VGPR allocation" << properties.minVgprAllocation << endl;
     cout << setw(width) << left << "Max VGPR allocation" << properties.maxVgprAllocation << endl;
     cout << setw(width) << left << "VGPR allocation granularity" << properties.vgprAllocationGranularity << endl;
+#endif // VK_AMD_shader_core_properties
 }
 
 void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
