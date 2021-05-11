@@ -397,6 +397,37 @@ void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
 #endif
 }
 
+void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice,
+    std::streamsize width)
+{
+#ifdef VK_NV_mesh_shader
+    const auto& features = physicalDevice->getMeshShaderFeatures();
+    const auto& properties = physicalDevice->getMeshShaderProperties();
+    cout << endl;
+    cout << setw(width) << left << "Task shader" << booleanString(features.taskShader) << endl;
+    cout << setw(width) << left << "Mesh shader" << booleanString(features.meshShader) << endl;
+    cout << setw(width) << left << "Max draw mesh task count" << properties.maxDrawMeshTasksCount << endl;
+    cout << setw(width) << left << "Max task work group invocations" << properties.maxTaskWorkGroupInvocations << endl;
+    cout << setw(width) << left << "Max task work group size"
+        << properties.maxTaskWorkGroupSize[0] << ", "
+        << properties.maxTaskWorkGroupSize[1] << ", "
+        << properties.maxTaskWorkGroupSize[2] << endl;
+    cout << setw(width) << left << "Max task total memory size" << properties.maxTaskTotalMemorySize << endl;
+    cout << setw(width) << left << "Max task output count" << properties.maxTaskOutputCount << endl;
+    cout << setw(width) << left << "Max mesh work group invocations" << properties.maxMeshWorkGroupInvocations << endl;
+    cout << setw(width) << left << "Max mesh work group size"
+        << properties.maxMeshWorkGroupSize[0] << ", "
+        << properties.maxMeshWorkGroupSize[1] << ", "
+        << properties.maxMeshWorkGroupSize[2] <<endl;
+    cout << setw(width) << left << "Max mesh total memory size" << properties.maxMeshTotalMemorySize << endl;
+    cout << setw(width) << left << "Max mesh output vertices" << properties.maxMeshOutputVertices << endl;
+    cout << setw(width) << left << "Max mesh output primitives" << properties.maxMeshOutputPrimitives << endl;
+    cout << setw(width) << left << "Max mesh multiview view count" << properties.maxMeshMultiviewViewCount << endl;
+    cout << setw(width) << left << "Mesh output per vertex granularity" << properties.meshOutputPerVertexGranularity << endl;
+    cout << setw(width) << left << "Mesh output per primitive granularity" << properties.meshOutputPerPrimitiveGranularity << endl;
+#endif // VK_NV_mesh_shader
+}
+
 void printExtensions(std::shared_ptr<magma::Extensions> extensions,
     std::streamsize width)
 {
@@ -471,6 +502,11 @@ int main()
             printShaderCoreProperties(physicalDevice, 35);
             if (deviceExtensions->AMD_shader_core_properties2)
                 printExtendedShaderCoreProperties(physicalDevice, 35);
+        }
+        if (deviceExtensions->NV_mesh_shader)
+        {
+            cout << endl << "==================== Mesh shader Properties ====================" << endl;
+            printMeshShaderProperties(physicalDevice, 40);
         }
         cout << endl << "==================== Device Extensions ====================" << endl;
         printExtensions(deviceExtensions, 45);
