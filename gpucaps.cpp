@@ -361,6 +361,26 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
     }
 }
 
+void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice,
+    std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_EXT_conservative_rasterization
+    const auto& properties = physicalDevice->getConservativeRasterizationProperties();
+    cout << endl;
+    cout << setw(width) << left << "Primitive overestimation size" << properties.primitiveOverestimationSize << endl;
+    cout << setw(width) << left << "Max extra primitive overestimation size" << properties.maxExtraPrimitiveOverestimationSize << endl;
+    cout << setw(width) << left << "Extra primitive overestimation size granularity" << properties.extraPrimitiveOverestimationSizeGranularity << endl;
+    cout << setw(width) << left << "Primitive underestimation" << booleanString(properties.primitiveUnderestimation) << endl;
+    cout << setw(width) << left << "Conservative point and line rasterization" << booleanString(properties.conservativePointAndLineRasterization) << endl;
+    cout << setw(width) << left << "Degenerate triangles rasterized" << booleanString(properties.degenerateTrianglesRasterized) << endl;
+    cout << setw(width) << left << "Degenerate lines rasterized" << booleanString(properties.degenerateLinesRasterized) << endl;
+    cout << setw(width) << left << "Fully covered fragment shader input variable" << booleanString(properties.fullyCoveredFragmentShaderInputVariable) << endl;
+    cout << setw(width) << left << "Conservative rasterization post depth coverage" << booleanString(properties.conservativeRasterizationPostDepthCoverage) << endl;
+#endif // VK_EXT_conservative_rasterization
+}
+
 void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -500,6 +520,11 @@ int main()
         cout << endl << "==================== Device Memory Heaps ====================" << endl;
         printDeviceMemoryHeaps(physicalDevice);
         auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
+        if (deviceExtensions->EXT_conservative_rasterization)
+        {
+            cout << endl << "==================== Conservative Rasterization Properties ====================" << endl;
+            printConservativeRasterizationProperties(physicalDevice, 50);
+        }
         if (deviceExtensions->AMD_shader_core_properties)
         {
             cout << endl << "==================== Shader Core Properties ====================" << endl;
