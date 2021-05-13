@@ -1,7 +1,7 @@
 #include <iomanip>
 #include <iostream>
 #include <climits>
-#include "third-party/magma/magma.h"
+#include "../magma/magma.h"
 #include "gpucaps.h"
 
 using std::cout;
@@ -361,6 +361,43 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
     }
 }
 
+void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, 
+    std::streamsize width)
+{
+    const auto features = physicalDevice->checkExtensionFeaturesSupport();
+    cout << setw(width) << left << "Device coherent memory" << booleanString(features.deviceCoherentMemory) << endl;
+    cout << setw(width) << left << "Depth clip enable" << booleanString(features.depthClipEnable) << endl;
+    cout << setw(width) << left << "Extended dynamic state" << booleanString(features.extendedDynamicState) << endl;
+    cout << setw(width) << left << "Host query reset" << booleanString(features.hostQueryReset) << endl;
+    cout << setw(width) << left << "Robust image access" << booleanString(features.robustImageAccess) << endl;
+    cout << setw(width) << left << "Index type uint8" << booleanString(features.indexTypeUint8) << endl;
+    cout << setw(width) << left << "Memory priority" << booleanString(features.memoryPriority) << endl;
+    cout << setw(width) << left << "Pipeline creation cache control" << booleanString(features.pipelineCreationCacheControl) << endl;
+    cout << setw(width) << left << "Private data" << booleanString(features.privateData) << endl;
+    cout << setw(width) << left << "Scalar block layout" << booleanString(features.scalarBlockLayout) << endl;
+    cout << setw(width) << left << "Shader demote to helper invocation" << booleanString(features.shaderDemoteToHelperInvocation) << endl;
+    cout << setw(width) << left << "Texel buffer alignment" << booleanString(features.texelBufferAlignment) << endl;
+    cout << setw(width) << left << "YCbCr image arrays" << booleanString(features.ycbcrImageArrays) << endl;
+    cout << setw(width) << left << "Imageless framebuffer" << booleanString(features.imagelessFramebuffer) << endl;
+    cout << setw(width) << left << "Pipeline executable info" << booleanString(features.pipelineExecutableInfo) << endl;
+    cout << setw(width) << left << "Sampler YCbCr conversion" << booleanString(features.samplerYcbcrConversion) << endl;
+    cout << setw(width) << left << "Separate depth stencil layouts" << booleanString(features.separateDepthStencilLayouts) << endl;
+    cout << setw(width) << left << "Shader draw parameters" << booleanString(features.shaderDrawParameters) << endl;
+    cout << setw(width) << left << "Shader subgroup extended types" << booleanString(features.shaderSubgroupExtendedTypes) << endl;
+    cout << setw(width) << left << "Shader terminate invocation" << booleanString(features.shaderTerminateInvocation) << endl;
+    cout << setw(width) << left << "Timeline semaphore" << booleanString(features.timelineSemaphore) << endl;
+    cout << setw(width) << left << "Uniform buffer standard layout" << booleanString(features.uniformBufferStandardLayout) << endl;
+    cout << setw(width) << left << "Corner sampled image" << booleanString(features.cornerSampledImage) << endl;
+    cout << setw(width) << left << "Coverage reduction mode" << booleanString(features.coverageReductionMode) << endl;
+    cout << setw(width) << left << "Dedicated allocation image aliasing" << booleanString(features.dedicatedAllocationImageAliasing) << endl;
+    cout << setw(width) << left << "Diagnostics config" << booleanString(features.diagnosticsConfig) << endl;
+    cout << setw(width) << left << "Fragment shader barycentric" << booleanString(features.fragmentShaderBarycentric) << endl;
+    cout << setw(width) << left << "Representative fragment test" << booleanString(features.representativeFragmentTest) << endl;
+    cout << setw(width) << left << "Exclusive scissor" << booleanString(features.exclusiveScissor) << endl;
+    cout << setw(width) << left << "Image footprint" << booleanString(features.imageFootprint) << endl;
+    cout << setw(width) << left << "Shader streaming multiprocessors" << booleanString(features.shaderSMBuiltins) << endl;
+}
+
 void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -538,6 +575,11 @@ int main()
         printDeviceMemoryTypes(physicalDevice);
         cout << endl << "==================== Device Memory Heaps ====================" << endl;
         printDeviceMemoryHeaps(physicalDevice);
+        if (instanceExtensions->KHR_get_physical_device_properties2)
+        {
+            cout << endl << "==================== Extension Features ====================" << endl << endl;
+            printExtensionFeatures(physicalDevice, 40);
+        }
         auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
         if (deviceExtensions->EXT_conservative_rasterization)
         {
