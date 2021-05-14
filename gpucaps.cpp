@@ -541,6 +541,23 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, 
     cout << setw(width) << left << "Max descriptor set update after bind input attachments" << properties.maxDescriptorSetUpdateAfterBindInputAttachments << endl;
 #endif // VK_EXT_blend_operation_advanced
 }
+
+void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice,
+    std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_EXT_blend_operation_advanced
+    const auto& properties = physicalDevice->getBlendOperationAdvancedProperties();
+    cout << setw(width) << left << "Advanced blend max color attachments" << properties.advancedBlendMaxColorAttachments << endl;
+    cout << setw(width) << left << "Advanced blend independent blend" << booleanString(properties.advancedBlendIndependentBlend) << endl;
+    cout << setw(width) << left << "Advanced blend non-premultiplied src color" << booleanString(properties.advancedBlendNonPremultipliedSrcColor) << endl;
+    cout << setw(width) << left << "Advanced blend non-premultiplied dst color" << booleanString(properties.advancedBlendNonPremultipliedDstColor) << endl;
+    cout << setw(width) << left << "Advanced blend correlated overlap" << booleanString(properties.advancedBlendCorrelatedOverlap) << endl;
+    cout << setw(width) << left << "Advanced blend all operations" << booleanString(properties.advancedBlendAllOperations) << endl;
+#endif // VK_EXT_blend_operation_advanced
+}
+
 void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -654,6 +671,11 @@ int main()
         {
             cout << endl << "==================== Descriptor Indexing Properties ====================" << endl << endl;
             printDescriptorIndexingProperties(physicalDevice, 65);
+        }
+        if (deviceExtensions->EXT_blend_operation_advanced)
+        {
+            cout << endl << "==================== Advanced Blend Operations ====================" << endl << endl;
+            printAdvancedBlendOperationProperties(physicalDevice, 45);
         }
         if (deviceExtensions->NV_ray_tracing)
         {
