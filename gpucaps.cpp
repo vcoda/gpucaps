@@ -489,6 +489,58 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice,
 #endif // VK_NV_mesh_shader
 }
 
+void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_EXT_descriptor_indexing
+    const auto& features = physicalDevice->getDescriptorIndexingFeatures();
+    cout << setw(width) << left << "Shader input attachment array dynamic indexing" << booleanString(features.shaderInputAttachmentArrayDynamicIndexing) << endl;
+    cout << setw(width) << left << "Shader uniform texel buffer array dynamic indexing" << booleanString(features.shaderUniformTexelBufferArrayDynamicIndexing) << endl;
+    cout << setw(width) << left << "Shader storage texel buffer array dynamic indexing" << booleanString(features.shaderStorageTexelBufferArrayDynamicIndexing) << endl;
+    cout << setw(width) << left << "Shader uniform buffer array non-uniform indexing" << booleanString(features.shaderUniformBufferArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader sampled image array non-uniform indexing" << booleanString(features.shaderSampledImageArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader storage buffer array non-uniform indexing" << booleanString(features.shaderStorageBufferArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader storage image array non-uniform indexing" << booleanString(features.shaderStorageImageArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader input attachment array non-uniform indexing" << booleanString(features.shaderInputAttachmentArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader uniform texel buffer array non-uniform indexing" << booleanString(features.shaderUniformTexelBufferArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Shader storage texel buffer array non-uniform indexing" << booleanString(features.shaderStorageTexelBufferArrayNonUniformIndexing) << endl;
+    cout << setw(width) << left << "Descriptor binding uniform buffer update after bind" << booleanString(features.descriptorBindingUniformBufferUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding sampled image update after bind" << booleanString(features.descriptorBindingSampledImageUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding storage image update after bind" << booleanString(features.descriptorBindingStorageImageUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding storage buffer update after bind" << booleanString(features.descriptorBindingStorageBufferUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding uniform texel buffer update after bind" << booleanString(features.descriptorBindingUniformTexelBufferUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding storage texel buffer update after bind" << booleanString(features.descriptorBindingStorageTexelBufferUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Descriptor binding update unused while pending" << booleanString(features.descriptorBindingUpdateUnusedWhilePending) << endl;
+    cout << setw(width) << left << "Descriptor binding partially bound" << booleanString(features.descriptorBindingPartiallyBound) << endl;
+    cout << setw(width) << left << "Descriptor binding variable descriptor count" << booleanString(features.descriptorBindingVariableDescriptorCount) << endl;
+    cout << setw(width) << left << "Runtime descriptor array" << booleanString(features.runtimeDescriptorArray) << endl;
+    const auto& properties = physicalDevice->getDescriptorIndexingProperties();
+    cout << setw(width) << left << "Max update after bind descriptors in all pools" << properties.maxUpdateAfterBindDescriptorsInAllPools << endl;
+    cout << setw(width) << left << "Shader uniform buffer array non-uniform indexing native" << booleanString(properties.shaderUniformBufferArrayNonUniformIndexingNative) << endl;
+    cout << setw(width) << left << "Shader sampled image array non-uniform indexing native" << booleanString(properties.shaderSampledImageArrayNonUniformIndexingNative) << endl;
+    cout << setw(width) << left << "Shader storage buffer array non-uniform indexing native" << booleanString(properties.shaderStorageBufferArrayNonUniformIndexingNative) << endl;
+    cout << setw(width) << left << "Shader storage image array non-uniform indexing native" << booleanString(properties.shaderStorageImageArrayNonUniformIndexingNative) << endl;
+    cout << setw(width) << left << "Shader input attachment array non-uniform indexing native" << booleanString(properties.shaderInputAttachmentArrayNonUniformIndexingNative) << endl;
+    cout << setw(width) << left << "Robust buffer access update after bind" << booleanString(properties.robustBufferAccessUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Quad divergent implicit LOD" << booleanString(properties.quadDivergentImplicitLod) << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind samplers" << properties.maxPerStageDescriptorUpdateAfterBindSamplers << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind uniform buffers" << properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind storage buffers" << properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind sampled images" << properties.maxPerStageDescriptorUpdateAfterBindSampledImages << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind storage images" << properties.maxPerStageDescriptorUpdateAfterBindStorageImages << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind input attachments" << properties.maxPerStageDescriptorUpdateAfterBindInputAttachments << endl;
+    cout << setw(width) << left << "Max per stage update after bind resources" << properties.maxPerStageUpdateAfterBindResources << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind samplers" << properties.maxDescriptorSetUpdateAfterBindSamplers << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind uniform buffers" << properties.maxDescriptorSetUpdateAfterBindUniformBuffers << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind uniform buffers dynamic" << properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind storage buffers" << properties.maxDescriptorSetUpdateAfterBindStorageBuffers << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind storage buffers dynamic" << properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind sampled images" << properties.maxDescriptorSetUpdateAfterBindSampledImages << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind storage images" << properties.maxDescriptorSetUpdateAfterBindStorageImages << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind input attachments" << properties.maxDescriptorSetUpdateAfterBindInputAttachments << endl;
+#endif // VK_EXT_blend_operation_advanced
+}
 void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -597,6 +649,11 @@ int main()
         {
             cout << endl << "==================== Mesh Shader Properties ====================" << endl;
             printMeshShaderProperties(physicalDevice, 40);
+        }
+        if (deviceExtensions->EXT_descriptor_indexing)
+        {
+            cout << endl << "==================== Descriptor Indexing Properties ====================" << endl << endl;
+            printDescriptorIndexingProperties(physicalDevice, 65);
         }
         if (deviceExtensions->NV_ray_tracing)
         {
