@@ -366,6 +366,7 @@ void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice,
 {
     const auto features = physicalDevice->checkExtensionFeaturesSupport();
     cout << setw(width) << left << "Device coherent memory" << booleanString(features.deviceCoherentMemory) << endl;
+    cout << setw(width) << left << "Advanced blend coherent operations" << booleanString(features.advancedBlendCoherentOperations) << endl;
     cout << setw(width) << left << "Depth clip enable" << booleanString(features.depthClipEnable) << endl;
     cout << setw(width) << left << "Extended dynamic state" << booleanString(features.extendedDynamicState) << endl;
     cout << setw(width) << left << "Host query reset" << booleanString(features.hostQueryReset) << endl;
