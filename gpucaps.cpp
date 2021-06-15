@@ -490,6 +490,24 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice,
 #endif // VK_NV_mesh_shader
 }
 
+void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    physicalDevice;
+    width;
+#ifdef VK_EXT_inline_uniform_block
+    const auto& features = physicalDevice->getInlineUniformBlockFeatures();
+    const auto& properties = physicalDevice->getInlineUniformBlockProperties();
+    cout << endl;
+    cout << setw(width) << left << "Inline uniform block" << booleanString(features.inlineUniformBlock) << endl;
+    cout << setw(width) << left << "Descriptor binding inline uniform block update after bind" << booleanString(features.descriptorBindingInlineUniformBlockUpdateAfterBind) << endl;
+    cout << setw(width) << left << "Max inline uniform block size" << properties.maxInlineUniformBlockSize << endl;
+    cout << setw(width) << left << "Max per stage descriptor inline uniform blocks" << properties.maxPerStageDescriptorInlineUniformBlocks << endl;
+    cout << setw(width) << left << "Max per stage descriptor update after bind inline uniform blocks" << properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks << endl;
+    cout << setw(width) << left << "Max descriptor set inline uniform blocks" << properties.maxDescriptorSetInlineUniformBlocks << endl;
+    cout << setw(width) << left << "Max descriptor set update after bind inline uniform blocks" << properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks << endl;
+#endif // VK_EXT_inline_uniform_block
+}
+
 void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     physicalDevice;
@@ -667,6 +685,11 @@ int main()
         {
             cout << endl << "==================== Mesh Shader Properties ====================" << endl;
             printMeshShaderProperties(physicalDevice, 40);
+        }
+        if (deviceExtensions->EXT_inline_uniform_block)
+        {
+            cout << endl << "==================== Inline Uniform Block Properties ====================" << endl;
+            printInlineUniformBlockProperties(physicalDevice, 65);
         }
         if (deviceExtensions->EXT_descriptor_indexing)
         {
