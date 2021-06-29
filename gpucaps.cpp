@@ -579,6 +579,28 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, 
 #endif // VK_EXT_blend_operation_advanced
 }
 
+void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    MAGMA_UNUSED(width);
+#ifdef VK_EXT_transform_feedback
+    const auto& features = physicalDevice->getTransformFeedbackFeatures();
+    cout << setw(width) << left << "Transform feedback" << booleanString(features.transformFeedback) << endl;
+    cout << setw(width) << left << "Geometry streams" << booleanString(features.geometryStreams) << endl;
+    const auto& properties = physicalDevice->getTransformFeedbackProperties();
+    cout << setw(width) << left << "Max transform feedback streams" << properties.maxTransformFeedbackStreams << endl;
+    cout << setw(width) << left << "Max transform feedback buffers" << properties.maxTransformFeedbackBuffers << endl;
+    cout << setw(width) << left << "Max transform feedback buffer size" << properties.maxTransformFeedbackBufferSize << endl;
+    cout << setw(width) << left << "Max transform feedback stream data size" << properties.maxTransformFeedbackStreamDataSize << endl;
+    cout << setw(width) << left << "Max transform feedback buffer data size" << properties.maxTransformFeedbackBufferDataSize << endl;
+    cout << setw(width) << left << "Max transform feedback buffer data stride" << properties.maxTransformFeedbackBufferDataStride << endl;
+    cout << setw(width) << left << "Transform feedback queries" << booleanString(properties.transformFeedbackQueries) << endl;
+    cout << setw(width) << left << "Transform feedback streams lines triangles" << booleanString(properties.transformFeedbackStreamsLinesTriangles) << endl;
+    cout << setw(width) << left << "Transform feedback rasterization stream select" << booleanString(properties.transformFeedbackRasterizationStreamSelect) << endl;
+    cout << setw(width) << left << "Transform feedback draw" << booleanString(properties.transformFeedbackDraw) << endl;
+#endif // VK_EXT_transform_feedback
+}
+
 void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -718,6 +740,11 @@ int main()
         {
             cout << endl << "==================== Descriptor Indexing Properties ====================" << endl << endl;
             printDescriptorIndexingProperties(physicalDevice, 65);
+        }
+        if (deviceExtensions->EXT_transform_feedback)
+        {
+            cout << endl << "==================== Transform Feedback Properties ====================" << endl << endl;
+            printTransformFeedbackProperties(physicalDevice, 50);
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
