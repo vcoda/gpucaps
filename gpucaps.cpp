@@ -419,6 +419,24 @@ void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalD
 #endif // VK_EXT_conservative_rasterization
 }
 
+void printLineRasterizationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    MAGMA_UNUSED(width);
+#ifdef VK_EXT_line_rasterization
+    const auto& features = physicalDevice->getLineRasterizationFeatures();
+    cout << endl;
+    cout << setw(width) << left << "Rectangular lines" << booleanString(features.rectangularLines) << endl;
+    cout << setw(width) << left << "Bresenham lines" << booleanString(features.bresenhamLines) << endl;
+    cout << setw(width) << left << "Smooth lines" << booleanString(features.smoothLines) << endl;
+    cout << setw(width) << left << "Stippled rectangular lines" << booleanString(features.stippledRectangularLines) << endl;
+    cout << setw(width) << left << "Stippled Bresenham lines" << booleanString(features.stippledBresenhamLines) << endl;
+    cout << setw(width) << left << "Stippled smooth lines" << booleanString(features.stippledSmoothLines) << endl;
+    const auto& properties = physicalDevice->getLineRasterizationProperties();
+    cout << setw(width) << left << "Line sub-pixel precision bits" << properties.lineSubPixelPrecisionBits << endl;
+#endif // VK_EXT_line_rasterization
+}
+
 void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -673,6 +691,11 @@ int main()
         {
             cout << endl << "==================== Conservative Rasterization Properties ====================" << endl;
             printConservativeRasterizationProperties(physicalDevice, 50);
+        }
+        if (deviceExtensions->EXT_line_rasterization)
+        {
+            cout << endl << "==================== Line Rasterization Properties ====================" << endl;
+            printLineRasterizationProperties(physicalDevice, 35);
         }
         if (deviceExtensions->AMD_shader_core_properties)
         {
