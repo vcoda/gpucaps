@@ -1,11 +1,6 @@
-#include "../magma/magma.h"
 #include "gpucaps.h"
+#include "../magma/magma.h"
 
-using std::cout;
-using std::cin;
-using std::endl;
-using std::setw;
-using std::left;
 std::string vendorIDString(uint32_t vendorID)
 {
     const uint16_t pciVendorID = vendorID & 0xFFFF;
@@ -21,262 +16,264 @@ std::string vendorIDString(uint32_t vendorID)
     return "Unknown";
 }
 
-void printDeviceGroups(magma::InstancePtr instance,
-    std::streamsize width)
+void printDeviceGroups(magma::InstancePtr instance, std::streamsize width)
 {
-    const auto& physicalDeviceGroups = instance->enumeratePhysicalDeviceGroups();
+    const auto physicalDeviceGroups = instance->enumeratePhysicalDeviceGroups();
     uint32_t physicalGroupIndex = 0;
     for (const auto& physicalDeviceGroup : physicalDeviceGroups)
     {
-        cout << endl;
-        cout << "#" << physicalGroupIndex++ << endl << endl;
-        cout << setw(width) << left << "Physical device count " << physicalDeviceGroup.physicalDeviceCount << endl;;
-        cout << setw(width) << left << "Subset allocation" << booleanString(physicalDeviceGroup.subsetAllocation) << endl;;
-        cout << endl;
+        printEndLn();
+        std::cout << "#" << physicalGroupIndex++ << std::endl << std::endl;
+        setFieldWidth(width);
+        printLn("Physical device count ", physicalDeviceGroup.physicalDeviceCount);
+        printLn("Subset allocation", booleanString(physicalDeviceGroup.subsetAllocation));
+        printEndLn();
     }
 }
 
-void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice,
-    uint32_t deviceId,
-    std::streamsize width)
+void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t deviceId, std::streamsize width)
 {
-    const auto& properties = physicalDevice->getProperties();
-    cout << endl << "=============== " << properties.deviceName << " (" << deviceId << ") ===============" << endl;
-    cout << endl;
-    cout << std::hex;
-    cout << setw(width) << left << "API version" << versionString(properties.apiVersion) << endl;
-    cout << setw(width) << left << "Driver version" << versionString(properties.driverVersion) << endl;
-    cout << setw(width) << left << "Vendor ID" << vendorIDString(properties.vendorID) << " (0x" << properties.vendorID << ")" << endl;
-    cout << setw(width) << left << "Device ID" << "0x" << properties.deviceID << endl;
-    cout << setw(width) << left << "Device type" << magma::helpers::stringize(properties.deviceType) << endl;
-    cout << std::dec;
+    const auto properties = physicalDevice->getProperties();
+    printHeading((std::string(properties.deviceName) + " (" + std::to_string(deviceId) + ")").c_str());
+    printEndLn();
+    setFieldWidth(width);
+    printLn("API version", versionString(properties.apiVersion));
+    printLn("Driver version", versionString(properties.driverVersion));
+    std::cout << std::hex;
+    std::cout << std::setw(width) << std::left << "Vendor ID" << vendorIDString(properties.vendorID) << " (0x" << properties.vendorID << ")" << std::endl;
+    std::cout << std::setw(width) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
+    std::cout << std::dec;
+    printLn("Device type", magma::helpers::stringize(properties.deviceType));
 }
 
-void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     const auto& features = physicalDevice->getFeatures();
-    cout << endl;
-    cout << setw(width) << left << "Robust buffer access" << booleanString(features.robustBufferAccess) << endl;
-    cout << setw(width) << left << "Full draw index Uint32" << booleanString(features.fullDrawIndexUint32) << endl;
-    cout << setw(width) << left << "Image cube array" << booleanString(features.imageCubeArray) << endl;
-    cout << setw(width) << left << "Independent blend" << booleanString(features.independentBlend) << endl;
-    cout << setw(width) << left << "Geometry shader" << booleanString(features.geometryShader) << endl;
-    cout << setw(width) << left << "Tessellation shader" << booleanString(features.tessellationShader) << endl;
-    cout << setw(width) << left << "Sample rate shading" << booleanString(features.sampleRateShading) << endl;
-    cout << setw(width) << left << "Dual src blend" << booleanString(features.dualSrcBlend) << endl;
-    cout << setw(width) << left << "Logic op" << booleanString(features.logicOp) << endl;
-    cout << setw(width) << left << "Multi draw indirect" << booleanString(features.multiDrawIndirect) << endl;
-    cout << setw(width) << left << "Draw indirect first instance" << booleanString(features.drawIndirectFirstInstance) << endl;
-    cout << setw(width) << left << "Depth clamp" << booleanString(features.depthClamp) << endl;
-    cout << setw(width) << left << "Depth bias clamp" << booleanString(features.depthBiasClamp) << endl;
-    cout << setw(width) << left << "Fill mode non-solid" << booleanString(features.fillModeNonSolid) << endl;
-    cout << setw(width) << left << "Depth bounds" << booleanString(features.depthBounds) << endl;
-    cout << setw(width) << left << "Wide lines" << booleanString(features.wideLines) << endl;
-    cout << setw(width) << left << "Large points" << booleanString(features.largePoints) << endl;
-    cout << setw(width) << left << "Alpha to one" << booleanString(features.alphaToOne) << endl;
-    cout << setw(width) << left << "Multi viewport" << booleanString(features.multiViewport) << endl;
-    cout << setw(width) << left << "Sampler anisotropy" << booleanString(features.samplerAnisotropy) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Texture compression ETC2" << booleanString(features.textureCompressionETC2) << endl;
-    cout << setw(width) << left << "Texture compression ASTC/LDR" << booleanString(features.textureCompressionASTC_LDR) << endl;
-    cout << setw(width) << left << "Texture compression BC (DXT)" << booleanString(features.textureCompressionBC) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Occlusion query precise" << booleanString(features.occlusionQueryPrecise) << endl;
-    cout << setw(width) << left << "Pipeline statistics query" << booleanString(features.pipelineStatisticsQuery) << endl;
-    cout << setw(width) << left << "Vertex pipeline stores and atomics" << booleanString(features.vertexPipelineStoresAndAtomics) << endl;
-    cout << setw(width) << left << "Fragment stores and atomics" << booleanString(features.fragmentStoresAndAtomics) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Shader tessellation and geometry point size" << booleanString(features.shaderTessellationAndGeometryPointSize) << endl;
-    cout << setw(width) << left << "Shader image gather extended" << booleanString(features.shaderImageGatherExtended) << endl;
-    cout << setw(width) << left << "Shader storage image extended formats" << booleanString(features.shaderStorageImageExtendedFormats) << endl;
-    cout << setw(width) << left << "Shader storage image multisample" << booleanString(features.shaderStorageImageMultisample) << endl;
-    cout << setw(width) << left << "Shader storage image read without format" << booleanString(features.shaderStorageImageReadWithoutFormat) << endl;
-    cout << setw(width) << left << "Shader storage image write without format" << booleanString(features.shaderStorageImageWriteWithoutFormat) << endl;
-    cout << setw(width) << left << "Shader uniform buffer array dynamic indexing" << booleanString(features.shaderUniformBufferArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader sampled image array dynamic indexing" << booleanString(features.shaderSampledImageArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader storage buffer array dynamic indexing" << booleanString(features.shaderStorageBufferArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader storage image array dynamic indexing" << booleanString(features.shaderStorageImageArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader clip distance" << booleanString(features.shaderClipDistance) << endl;
-    cout << setw(width) << left << "Shader cull distance" << booleanString(features.shaderCullDistance) << endl;
-    cout << setw(width) << left << "Shader float64" << booleanString(features.shaderFloat64) << endl;
-    cout << setw(width) << left << "Shader int64" << booleanString(features.shaderInt64) << endl;
-    cout << setw(width) << left << "Shader int16" << booleanString(features.shaderInt16) << endl;
-    cout << setw(width) << left << "Shader resource residency" << booleanString(features.shaderResourceResidency) << endl;
-    cout << setw(width) << left << "Shader resource min LOD" << booleanString(features.shaderResourceMinLod) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Sparse binding" << booleanString(features.sparseBinding) << endl;
-    cout << setw(width) << left << "Sparse residency buffer" << booleanString(features.sparseResidencyBuffer) << endl;
-    cout << setw(width) << left << "Sparse residency image2D" << booleanString(features.sparseResidencyImage2D) << endl;
-    cout << setw(width) << left << "Sparse residency image3D" << booleanString(features.sparseResidencyImage3D) << endl;
-    cout << setw(width) << left << "Sparse residency 2 samples" << booleanString(features.sparseResidency2Samples) << endl;
-    cout << setw(width) << left << "Sparse residency 4 samples" << booleanString(features.sparseResidency4Samples) << endl;
-    cout << setw(width) << left << "Sparse residency 8 samples" << booleanString(features.sparseResidency8Samples) << endl;
-    cout << setw(width) << left << "Sparse residency 16 samples" << booleanString(features.sparseResidency16Samples) << endl;
-    cout << setw(width) << left << "Sparse residency aliased" << booleanString(features.sparseResidencyAliased) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Variable multisample rate" << booleanString(features.variableMultisampleRate) << endl;
-    cout << setw(width) << left << "Inherited queries" << booleanString(features.inheritedQueries) << endl;
+    setFieldWidth(width);
+    printEndLn();
+    printLn("Robust buffer access", booleanString(features.robustBufferAccess));
+    printLn("Full draw index Uint32", booleanString(features.fullDrawIndexUint32));
+    printLn("Image cube array", booleanString(features.imageCubeArray));
+    printLn("Independent blend", booleanString(features.independentBlend));
+    printLn("Geometry shader", booleanString(features.geometryShader));
+    printLn("Tessellation shader", booleanString(features.tessellationShader));
+    printLn("Sample rate shading", booleanString(features.sampleRateShading));
+    printLn("Dual src blend", booleanString(features.dualSrcBlend));
+    printLn("Logic op", booleanString(features.logicOp));
+    printLn("Multi draw indirect", booleanString(features.multiDrawIndirect));
+    printLn("Draw indirect first instance", booleanString(features.drawIndirectFirstInstance));
+    printLn("Depth clamp", booleanString(features.depthClamp));
+    printLn("Depth bias clamp", booleanString(features.depthBiasClamp));
+    printLn("Fill mode non-solid", booleanString(features.fillModeNonSolid));
+    printLn("Depth bounds", booleanString(features.depthBounds));
+    printLn("Wide lines", booleanString(features.wideLines));
+    printLn("Large points", booleanString(features.largePoints));
+    printLn("Alpha to one", booleanString(features.alphaToOne));
+    printLn("Multi viewport", booleanString(features.multiViewport));
+    printLn("Sampler anisotropy", booleanString(features.samplerAnisotropy));
+    printEndLn();
+    printLn("Texture compression ETC2", booleanString(features.textureCompressionETC2));
+    printLn("Texture compression ASTC/LDR", booleanString(features.textureCompressionASTC_LDR));
+    printLn("Texture compression BC", booleanString(features.textureCompressionBC));
+    printEndLn();
+    printLn("Occlusion query precise", booleanString(features.occlusionQueryPrecise));
+    printLn("Pipeline statistics query", booleanString(features.pipelineStatisticsQuery));
+    printLn("Vertex pipeline stores and atomics", booleanString(features.vertexPipelineStoresAndAtomics));
+    printLn("Fragment stores and atomics", booleanString(features.fragmentStoresAndAtomics));
+    printEndLn();
+    printLn("Shader tessellation and geometry point size", booleanString(features.shaderTessellationAndGeometryPointSize));
+    printLn("Shader image gather extended", booleanString(features.shaderImageGatherExtended));
+    printLn("Shader storage image extended formats", booleanString(features.shaderStorageImageExtendedFormats));
+    printLn("Shader storage image multisample", booleanString(features.shaderStorageImageMultisample));
+    printLn("Shader storage image read without format", booleanString(features.shaderStorageImageReadWithoutFormat));
+    printLn("Shader storage image write without format", booleanString(features.shaderStorageImageWriteWithoutFormat));
+    printLn("Shader uniform buffer array dynamic indexing", booleanString(features.shaderUniformBufferArrayDynamicIndexing));
+    printLn("Shader sampled image array dynamic indexing", booleanString(features.shaderSampledImageArrayDynamicIndexing));
+    printLn("Shader storage buffer array dynamic indexing", booleanString(features.shaderStorageBufferArrayDynamicIndexing));
+    printLn("Shader storage image array dynamic indexing", booleanString(features.shaderStorageImageArrayDynamicIndexing));
+    printLn("Shader clip distance", booleanString(features.shaderClipDistance));
+    printLn("Shader cull distance", booleanString(features.shaderCullDistance));
+    printLn("Shader float64", booleanString(features.shaderFloat64));
+    printLn("Shader int64", booleanString(features.shaderInt64));
+    printLn("Shader int16", booleanString(features.shaderInt16));
+    printLn("Shader resource residency", booleanString(features.shaderResourceResidency));
+    printLn("Shader resource min LOD", booleanString(features.shaderResourceMinLod));
+    printEndLn();
+    printLn("Sparse binding", booleanString(features.sparseBinding));
+    printLn("Sparse residency buffer", booleanString(features.sparseResidencyBuffer));
+    printLn("Sparse residency image2D", booleanString(features.sparseResidencyImage2D));
+    printLn("Sparse residency image3D", booleanString(features.sparseResidencyImage3D));
+    printLn("Sparse residency 2 samples", booleanString(features.sparseResidency2Samples));
+    printLn("Sparse residency 4 samples", booleanString(features.sparseResidency4Samples));
+    printLn("Sparse residency 8 samples", booleanString(features.sparseResidency8Samples));
+    printLn("Sparse residency 16 samples", booleanString(features.sparseResidency16Samples));
+    printLn("Sparse residency aliased", booleanString(features.sparseResidencyAliased));
+    printEndLn();
+    printLn("Variable multisample rate", booleanString(features.variableMultisampleRate));
+    printLn("Inherited queries", booleanString(features.inheritedQueries));
 }
 
-void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     const auto& limits = physicalDevice->getProperties().limits;
-    cout << endl;
-    cout << setw(width) << left << "Max image dimension 1D" << limits.maxImageDimension1D << endl;
-    cout << setw(width) << left << "Max image dimension 2D" << limits.maxImageDimension2D << endl;
-    cout << setw(width) << left << "Max image dimension 3D" << limits.maxImageDimension3D << endl;
-    cout << setw(width) << left << "Max image dimension Cube" << limits.maxImageDimensionCube << endl;
-    cout << setw(width) << left << "Max image array layers" << limits.maxImageArrayLayers << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max texel buffer elements" << uint32String(limits.maxTexelBufferElements) << endl;
-    cout << setw(width) << left << "Max uniform buffer range" << uint32String(limits.maxUniformBufferRange) << endl;
-    cout << setw(width) << left << "Max storage buffer range" << uint32String(limits.maxStorageBufferRange) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max push constants size" << limits.maxPushConstantsSize << endl;
-    cout << setw(width) << left << "Max memory allocation count" << limits.maxMemoryAllocationCount << endl;
-    cout << setw(width) << left << "Max sampler allocation count" << limits.maxSamplerAllocationCount << endl;
-    cout << setw(width) << left << "Buffer image granularity" << limits.bufferImageGranularity << endl;
-    cout << setw(width) << left << "Sparse address space size" << limits.sparseAddressSpaceSize << endl;
-    cout << setw(width) << left << "Max bound descriptor sets" << limits.maxBoundDescriptorSets << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max per stage descriptor samplers" << uint32String(limits.maxPerStageDescriptorSamplers) << endl;
-    cout << setw(width) << left << "Max per stage descriptor uniform buffers" << uint32String(limits.maxPerStageDescriptorUniformBuffers) << endl;
-    cout << setw(width) << left << "Max per stage descriptor storage buffers" << uint32String(limits.maxPerStageDescriptorStorageBuffers) << endl;
-    cout << setw(width) << left << "Max per stage descriptor sampled images" << uint32String(limits.maxPerStageDescriptorSampledImages) << endl;
-    cout << setw(width) << left << "Max per stage descriptor storage images" << uint32String(limits.maxPerStageDescriptorStorageImages) << endl;
-    cout << setw(width) << left << "Max per stage descriptor input attachments" << uint32String(limits.maxPerStageDescriptorInputAttachments) << endl;
-    cout << setw(width) << left << "Max per stage resources" << uint32String(limits.maxPerStageResources) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max descriptor set samplers" << uint32String(limits.maxDescriptorSetSamplers) << endl;
-    cout << setw(width) << left << "Max descriptor set uniform buffers" << uint32String(limits.maxDescriptorSetUniformBuffers) << endl;
-    cout << setw(width) << left << "Max descriptor set uniform buffers dynamic" << uint32String(limits.maxDescriptorSetUniformBuffersDynamic) << endl;
-    cout << setw(width) << left << "Max descriptor set storage buffers" << uint32String(limits.maxDescriptorSetStorageBuffers) << endl;
-    cout << setw(width) << left << "Max descriptor set storage buffers dynamic" << uint32String(limits.maxDescriptorSetStorageBuffersDynamic) << endl;
-    cout << setw(width) << left << "Max descriptor set sampled images" << uint32String(limits.maxDescriptorSetSampledImages) << endl;
-    cout << setw(width) << left << "Max descriptor set storage images" << uint32String(limits.maxDescriptorSetStorageImages) << endl;
-    cout << setw(width) << left << "Max descriptor set input attachments" << uint32String(limits.maxDescriptorSetInputAttachments) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max vertex input attributes" << uint32String(limits.maxVertexInputAttributes) << endl;
-    cout << setw(width) << left << "Max vertex input bindings" << uint32String(limits.maxVertexInputBindings) << endl;
-    cout << setw(width) << left << "Max vertex input attribute offset" << uint32String(limits.maxVertexInputAttributeOffset) << endl;
-    cout << setw(width) << left << "Max vertex input binding stride" << limits.maxVertexInputBindingStride << endl;
-    cout << setw(width) << left << "Max vertex output components" << limits.maxVertexOutputComponents << endl;
-    cout << endl;
-    cout << setw(width + 10) << left << "Max tessellation generation level" << limits.maxTessellationGenerationLevel << endl;
-    cout << setw(width + 10) << left << "Max tessellation patchSize" << limits.maxTessellationPatchSize << endl;
-    cout << setw(width + 10) << left << "Max tessellation control per vertex input components" << limits.maxTessellationControlPerVertexInputComponents << endl;
-    cout << setw(width + 10) << left << "Max tessellation control per vertex output components" << limits.maxTessellationControlPerVertexOutputComponents << endl;
-    cout << setw(width + 10) << left << "Max tessellation control per patch output components" << limits.maxTessellationControlPerPatchOutputComponents << endl;
-    cout << setw(width + 10) << left << "Max tessellation control total output components" << limits.maxTessellationControlTotalOutputComponents << endl;
-    cout << setw(width + 10) << left << "Max tessellation evaluation input components" << limits.maxTessellationEvaluationInputComponents << endl;
-    cout << setw(width + 10) << left << "Max tessellation evaluation output components" << limits.maxTessellationEvaluationOutputComponents << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max geometry shader invocations" << limits.maxGeometryShaderInvocations << endl;
-    cout << setw(width) << left << "Max geometry input components" << limits.maxGeometryInputComponents << endl;
-    cout << setw(width) << left << "Max geometry output components" << limits.maxGeometryOutputComponents << endl;
-    cout << setw(width) << left << "Max geometry output vertices" << limits.maxGeometryOutputVertices << endl;
-    cout << setw(width) << left << "Max geometry total output components" << limits.maxGeometryTotalOutputComponents << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max fragment input components" << limits.maxFragmentInputComponents << endl;
-    cout << setw(width) << left << "Max fragment output attachments" << limits.maxFragmentOutputAttachments << endl;
-    cout << setw(width) << left << "Max fragment dual src attachments" << limits.maxFragmentDualSrcAttachments << endl;
-    cout << setw(width) << left << "Max fragment combined output resources" << uint32String(limits.maxFragmentCombinedOutputResources) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max compute shared memory size" << limits.maxComputeSharedMemorySize << endl;
-    cout << setw(width) << left << "Max compute workgroup count" << "[" <<
+    setFieldWidth(width);
+    printEndLn();
+    printLn("Max image dimension 1D", limits.maxImageDimension1D);
+    printLn("Max image dimension 2D", limits.maxImageDimension2D);
+    printLn("Max image dimension 3D", limits.maxImageDimension3D);
+    printLn("Max image dimension Cube", limits.maxImageDimensionCube);
+    printLn("Max image array layers", limits.maxImageArrayLayers);
+    printEndLn();
+    printLn("Max texel buffer elements", uint32String(limits.maxTexelBufferElements));
+    printLn("Max uniform buffer range", uint32String(limits.maxUniformBufferRange));
+    printLn("Max storage buffer range", uint32String(limits.maxStorageBufferRange));
+    printEndLn();
+    printLn("Max push constants size", limits.maxPushConstantsSize);
+    printLn("Max memory allocation count", limits.maxMemoryAllocationCount);
+    printLn("Max sampler allocation count", limits.maxSamplerAllocationCount);
+    printLn("Buffer image granularity", limits.bufferImageGranularity);
+    printLn("Sparse address space size", limits.sparseAddressSpaceSize);
+    printLn("Max bound descriptor sets", limits.maxBoundDescriptorSets);
+    printEndLn();
+    printLn("Max per stage descriptor samplers", uint32String(limits.maxPerStageDescriptorSamplers));
+    printLn("Max per stage descriptor uniform buffers", uint32String(limits.maxPerStageDescriptorUniformBuffers));
+    printLn("Max per stage descriptor storage buffers", uint32String(limits.maxPerStageDescriptorStorageBuffers));
+    printLn("Max per stage descriptor sampled images", uint32String(limits.maxPerStageDescriptorSampledImages));
+    printLn("Max per stage descriptor storage images", uint32String(limits.maxPerStageDescriptorStorageImages));
+    printLn("Max per stage descriptor input attachments", uint32String(limits.maxPerStageDescriptorInputAttachments));
+    printLn("Max per stage resources", uint32String(limits.maxPerStageResources));
+    printEndLn();
+    printLn("Max descriptor set samplers", uint32String(limits.maxDescriptorSetSamplers));
+    printLn("Max descriptor set uniform buffers", uint32String(limits.maxDescriptorSetUniformBuffers));
+    printLn("Max descriptor set uniform buffers dynamic", uint32String(limits.maxDescriptorSetUniformBuffersDynamic));
+    printLn("Max descriptor set storage buffers", uint32String(limits.maxDescriptorSetStorageBuffers));
+    printLn("Max descriptor set storage buffers dynamic", uint32String(limits.maxDescriptorSetStorageBuffersDynamic));
+    printLn("Max descriptor set sampled images", uint32String(limits.maxDescriptorSetSampledImages));
+    printLn("Max descriptor set storage images", uint32String(limits.maxDescriptorSetStorageImages));
+    printLn("Max descriptor set input attachments", uint32String(limits.maxDescriptorSetInputAttachments));
+    printEndLn();
+    printLn("Max vertex input attributes", uint32String(limits.maxVertexInputAttributes));
+    printLn("Max vertex input bindings", uint32String(limits.maxVertexInputBindings));
+    printLn("Max vertex input attribute offset", uint32String(limits.maxVertexInputAttributeOffset));
+    printLn("Max vertex input binding stride", limits.maxVertexInputBindingStride);
+    printLn("Max vertex output components", limits.maxVertexOutputComponents);
+    printEndLn();
+    printLn("Max tessellation generation level", limits.maxTessellationGenerationLevel);
+    printLn("Max tessellation patchSize", limits.maxTessellationPatchSize);
+    setFieldWidth(width + 10);
+    printEndLn();
+    printLn("Max tessellation control per vertex input components", limits.maxTessellationControlPerVertexInputComponents);
+    printLn("Max tessellation control per vertex output components", limits.maxTessellationControlPerVertexOutputComponents);
+    printLn("Max tessellation control per patch output components", limits.maxTessellationControlPerPatchOutputComponents);
+    printLn("Max tessellation control total output components", limits.maxTessellationControlTotalOutputComponents);
+    printLn("Max tessellation evaluation input components", limits.maxTessellationEvaluationInputComponents);
+    printLn("Max tessellation evaluation output components", limits.maxTessellationEvaluationOutputComponents);
+    setFieldWidth(width);
+    printEndLn();
+    printLn("Max geometry shader invocations", limits.maxGeometryShaderInvocations);
+    printLn("Max geometry input components", limits.maxGeometryInputComponents);
+    printLn("Max geometry output components", limits.maxGeometryOutputComponents);
+    printLn("Max geometry output vertices", limits.maxGeometryOutputVertices);
+    printLn("Max geometry total output components", limits.maxGeometryTotalOutputComponents);
+    printEndLn();
+    printLn("Max fragment input components", limits.maxFragmentInputComponents);
+    printLn("Max fragment output attachments", limits.maxFragmentOutputAttachments);
+    printLn("Max fragment dual src attachments", limits.maxFragmentDualSrcAttachments);
+    printLn("Max fragment combined output resources", uint32String(limits.maxFragmentCombinedOutputResources));
+    printEndLn();
+    printLn("Max compute shared memory size", limits.maxComputeSharedMemorySize);
+    std::cout << std::setw(width) << std::left << "Max compute workgroup count" << "[" <<
         limits.maxComputeWorkGroupCount[0] << ", " <<
         limits.maxComputeWorkGroupCount[1] << ", " <<
-        limits.maxComputeWorkGroupCount[2] << "]" << endl;
-    cout << setw(width) << left << "Max compute workgroup invocations" << limits.maxComputeWorkGroupInvocations << endl;
-    cout << setw(width) << left << "Max compute workgroup size" << "[" <<
+        limits.maxComputeWorkGroupCount[2] << "]" << std::endl;
+    std::cout << std::setw(width) << std::left << "Max compute workgroup invocations" << limits.maxComputeWorkGroupInvocations << std::endl;
+    std::cout << std::setw(width) << std::left << "Max compute workgroup size" << "[" <<
         limits.maxComputeWorkGroupSize[0] << ", " <<
         limits.maxComputeWorkGroupSize[1] << ", " <<
-        limits.maxComputeWorkGroupSize[2] << "]" << endl;
-    cout << endl;
-    cout << setw(width) << left << "Sub-pixel precision bits" << limits.subPixelPrecisionBits << endl;
-    cout << setw(width) << left << "Sub-texel precision bits " << limits.subTexelPrecisionBits << endl;
-    cout << setw(width) << left << "Mipmap precision bits" << limits.mipmapPrecisionBits << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max draw indexed index value" << uint32String(limits.maxDrawIndexedIndexValue) << endl;
-    cout << setw(width) << left << "Max draw indirect count" << uint32String(limits.maxDrawIndirectCount) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max sampler lod bias" << limits.maxSamplerLodBias << endl;
-    cout << setw(width) << left << "Max sampler anisotropy" << limits.maxSamplerAnisotropy << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max viewports" << limits.maxViewports << endl;
-    cout << setw(width) << left << "Max viewport dimensions" << "[" <<
+        limits.maxComputeWorkGroupSize[2] << "]" << std::endl;
+    printEndLn();
+    printLn("Sub-pixel precision bits", limits.subPixelPrecisionBits);
+    printLn("Sub-texel precision bits ", limits.subTexelPrecisionBits);
+    printLn("Mipmap precision bits", limits.mipmapPrecisionBits);
+    printEndLn();
+    printLn("Max draw indexed index value", uint32String(limits.maxDrawIndexedIndexValue));
+    printLn("Max draw indirect count", uint32String(limits.maxDrawIndirectCount));
+    printEndLn();
+    printLn("Max sampler lod bias", limits.maxSamplerLodBias);
+    printLn("Max sampler anisotropy", limits.maxSamplerAnisotropy);
+    printEndLn();
+    printLn("Max viewports", limits.maxViewports);
+    std::cout << std::setw(width) << std::left << "Max viewport dimensions" << "[" <<
         limits.maxViewportDimensions[0] << ", " <<
-        limits.maxViewportDimensions[1] << "]" << endl;
-    cout << setw(width) << left << "Viewport bounds range" << "[" <<
+        limits.maxViewportDimensions[1] << "]" << std::endl;
+    std::cout << std::setw(width) << std::left << "Viewport bounds range" << "[" <<
         limits.viewportBoundsRange[0] << ", " <<
-        limits.viewportBoundsRange[1] << "]" << endl;
-    cout << setw(width) << left << "Viewport sub-pixel bits" << limits.viewportSubPixelBits << endl;
-    cout << endl;
-    cout << setw(width) << left << "Min memory map alignment" << limits.minMemoryMapAlignment << endl;
-    cout << setw(width) << left << "Min texel buffer offset alignment" << limits.minTexelBufferOffsetAlignment << endl;
-    cout << setw(width) << left << "Min uniform buffer offset alignment" << limits.minUniformBufferOffsetAlignment << endl;
-    cout << setw(width) << left << "Min storage buffer offset alignment" << limits.minStorageBufferOffsetAlignment << endl;
-    cout << endl;
-    cout << setw(width) << left << "Min texel offset" << limits.minTexelOffset << endl;
-    cout << setw(width) << left << "Max texel offset" << limits.maxTexelOffset << endl;
-    cout << setw(width) << left << "Min texel gather offset" << limits.minTexelGatherOffset << endl;
-    cout << setw(width) << left << "Max texel gather offset" << limits.maxTexelGatherOffset << endl;
-    cout << setw(width) << left << "Min interpolation offset" << limits.minInterpolationOffset << endl;
-    cout << setw(width) << left << "Max interpolation offset" << limits.maxInterpolationOffset << endl;
-    cout << setw(width) << left << "Sub-pixel interpolation offset bits" << limits.subPixelInterpolationOffsetBits << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max framebuffer width" << limits.maxFramebufferWidth << endl;
-    cout << setw(width) << left << "Max framebuffer height" << limits.maxFramebufferHeight << endl;
-    cout << setw(width) << left << "Max framebuffer layers" << limits.maxFramebufferLayers << endl;
-    cout << setw(width) << left << "Framebuffer color sample counts" << limits.framebufferColorSampleCounts << endl;
-    cout << setw(width) << left << "Framebuffer depth sample counts" << limits.framebufferDepthSampleCounts << endl;
-    cout << setw(width) << left << "Framebuffer stencil sample counts" << limits.framebufferStencilSampleCounts << endl;
-    cout << setw(width) << left << "Framebuffer no attachments sample counts" << limits.framebufferNoAttachmentsSampleCounts << endl;
-    cout << setw(width) << left << "Max color attachments" << limits.maxColorAttachments << endl;
-    cout << endl;
-    cout << setw(width) << left << "Sampled image color sample counts" << limits.sampledImageColorSampleCounts << endl;
-    cout << setw(width) << left << "Sampled image integer sample counts" << limits.sampledImageIntegerSampleCounts << endl;
-    cout << setw(width) << left << "Sampled image depth sample counts" << limits.sampledImageDepthSampleCounts << endl;
-    cout << setw(width) << left << "Sampled image stencil sample counts" << limits.sampledImageStencilSampleCounts << endl;
-    cout << setw(width) << left << "Storage image sample counts" << limits.storageImageSampleCounts << endl;
-    cout << setw(width) << left << "Max sample mask words" << limits.maxSampleMaskWords << endl;
-    cout << endl;
-    cout << setw(width) << left << "Timestamp compute and graphics" << booleanString(limits.timestampComputeAndGraphics) << endl;
-    cout << setw(width) << left << "Timestamp period" << limits.timestampPeriod << endl;
-    cout << endl;
-    cout << setw(width) << left << "Max clip distances" << limits.maxClipDistances << endl;
-    cout << setw(width) << left << "Max cull distances" << limits.maxCullDistances << endl;
-    cout << setw(width) << left << "Max combined clip and cull distances" << limits.maxCombinedClipAndCullDistances << endl;
-    cout << endl;
-    cout << setw(width) << left << "Discrete queue priorities" << limits.discreteQueuePriorities << endl;
-    cout << endl;
-    cout << setw(width) << left << "Point size range" << "[" <<
+        limits.viewportBoundsRange[1] << "]" << std::endl;
+    printLn("Viewport sub-pixel bits", limits.viewportSubPixelBits);
+    printEndLn();
+    printLn("Min memory map alignment", limits.minMemoryMapAlignment);
+    printLn("Min texel buffer offset alignment", limits.minTexelBufferOffsetAlignment);
+    printLn("Min uniform buffer offset alignment", limits.minUniformBufferOffsetAlignment);
+    printLn("Min storage buffer offset alignment", limits.minStorageBufferOffsetAlignment);
+    printEndLn();
+    printLn("Min texel offset", limits.minTexelOffset);
+    printLn("Max texel offset", limits.maxTexelOffset);
+    printLn("Min texel gather offset", limits.minTexelGatherOffset);
+    printLn("Max texel gather offset", limits.maxTexelGatherOffset);
+    printLn("Min interpolation offset", limits.minInterpolationOffset);
+    printLn("Max interpolation offset", limits.maxInterpolationOffset);
+    printLn("Sub-pixel interpolation offset bits", limits.subPixelInterpolationOffsetBits);
+    printEndLn();
+    printLn("Max framebuffer width", limits.maxFramebufferWidth);
+    printLn("Max framebuffer height", limits.maxFramebufferHeight);
+    printLn("Max framebuffer layers", limits.maxFramebufferLayers);
+    printLn("Framebuffer color sample counts", limits.framebufferColorSampleCounts);
+    printLn("Framebuffer depth sample counts", limits.framebufferDepthSampleCounts);
+    printLn("Framebuffer stencil sample counts", limits.framebufferStencilSampleCounts);
+    printLn("Framebuffer no attachments sample counts", limits.framebufferNoAttachmentsSampleCounts);
+    printLn("Max color attachments", limits.maxColorAttachments);
+    printEndLn();
+    printLn("Sampled image color sample counts", limits.sampledImageColorSampleCounts);
+    printLn("Sampled image integer sample counts", limits.sampledImageIntegerSampleCounts);
+    printLn("Sampled image depth sample counts", limits.sampledImageDepthSampleCounts);
+    printLn("Sampled image stencil sample counts", limits.sampledImageStencilSampleCounts);
+    printLn("Storage image sample counts", limits.storageImageSampleCounts);
+    printLn("Max sample mask words", limits.maxSampleMaskWords);
+    printEndLn();
+    printLn("Timestamp compute and graphics", booleanString(limits.timestampComputeAndGraphics));
+    printLn("Timestamp period", limits.timestampPeriod);
+    printEndLn();
+    printLn("Max clip distances", limits.maxClipDistances);
+    printLn("Max cull distances", limits.maxCullDistances);
+    printLn("Max combined clip and cull distances", limits.maxCombinedClipAndCullDistances);
+    printEndLn();
+    printLn("Discrete queue priorities", limits.discreteQueuePriorities);
+    printEndLn();
+    std::cout << std::setw(width) << std::left << "Point size range" << "[" <<
         limits.pointSizeRange[0] << ", " <<
-        limits.pointSizeRange[1] << "]" << endl;
-    cout << setw(width) << left << "Line width range" << "[" <<
+        limits.pointSizeRange[1] << "]" << std::endl;
+    std::cout << std::setw(width) << std::left << "Line width range" << "[" <<
         limits.lineWidthRange[0] << ", " <<
-        limits.lineWidthRange[1] << "]" << endl;
-    cout << setw(width) << left << "Point size granularity" << limits.pointSizeGranularity << endl;
-    cout << setw(width) << left << "Line width granularity" << limits.lineWidthGranularity << endl;
-    cout << setw(width) << left << "Strict lines" << booleanString(limits.strictLines) << endl;
-    cout << endl;
-    cout << setw(width) << left << "Standard sample locations" << booleanString(limits.standardSampleLocations) << endl;
-    cout << setw(width) << left << "Optimal buffer copy offset alignment" << limits.optimalBufferCopyOffsetAlignment << endl;
-    cout << setw(width) << left << "Optimal buffer copy row pitch alignment" << limits.optimalBufferCopyRowPitchAlignment << endl;
-    cout << setw(width) << left << "Non-coherent atom size" << limits.nonCoherentAtomSize << endl;
+        limits.lineWidthRange[1] << "]" << std::endl;
+    printLn("Point size granularity", limits.pointSizeGranularity);
+    printLn("Line width granularity", limits.lineWidthGranularity);
+    printLn("Strict lines", booleanString(limits.strictLines));
+    printEndLn();
+    printLn("Standard sample locations", booleanString(limits.standardSampleLocations));
+    printLn("Optimal buffer copy offset alignment", limits.optimalBufferCopyOffsetAlignment);
+    printLn("Optimal buffer copy row pitch alignment", limits.optimalBufferCopyRowPitchAlignment);
+    printLn("Non-coherent atom size", limits.nonCoherentAtomSize);
 }
 
-void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    const auto& queueFamilyProperties = physicalDevice->getQueueFamilyProperties();
+    setFieldWidth(width);
+    const auto queueFamilyProperties = physicalDevice->getQueueFamilyProperties();
     uint32_t queueFamilyIndex = 0;
     for (const auto& properties : queueFamilyProperties)
     {
-        cout << endl << "#" << queueFamilyIndex << endl << endl;
-        cout << "Queue flags";
+        std::cout << std::endl << "#" << queueFamilyIndex << std::endl << std::endl;
+        std::cout << "Queue flags";
         for (const auto bit : {
             VK_QUEUE_GRAPHICS_BIT,
             VK_QUEUE_COMPUTE_BIT,
@@ -286,21 +283,21 @@ void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice,
         {
             if (properties.queueFlags & bit)
             {
-                cout << endl;
-                cout << '\t' << magma::helpers::stringize(bit);
+                printEndLn();
+                std::cout << '\t' << magma::helpers::stringize(bit);
             }
         }
-        cout << endl;
-        cout << setw(width) << left << "Queue count" << properties.queueCount << endl;
-        cout << setw(width) << left << "Timestamp valid bits" << properties.timestampValidBits << endl;
-        cout << setw(width) << left << "Min image transfer granularity" << "[" <<
+        printEndLn();
+        printLn("Queue count", properties.queueCount);
+        printLn("Timestamp valid bits", properties.timestampValidBits);
+        std::cout << std::setw(width) << std::left << "Min image transfer granularity" << "[" <<
             properties.minImageTransferGranularity.width << ", " <<
             properties.minImageTransferGranularity.height << ", " <<
-            properties.minImageTransferGranularity.depth << "]" << endl;
+            properties.minImageTransferGranularity.depth << "]" << std::endl;
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         // On Win32 doesn't requires display and visual ID
         const bool supportsPresentation = physicalDevice->getPresentationSupport(queueFamilyIndex, nullptr);
-        cout << setw(width) << left << "Supports presentation" << booleanString(supportsPresentation) << endl;
+        printLn("Supports presentation", booleanString(supportsPresentation));
 #endif
         ++queueFamilyIndex;
     }
@@ -308,13 +305,13 @@ void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice,
 
 void printDeviceMemoryTypes(magma::PhysicalDevicePtr physicalDevice)
 {
-    const auto& properties = physicalDevice->getMemoryProperties();
+    const auto properties = physicalDevice->getMemoryProperties();
     for (uint32_t i = 0; i < properties.memoryTypeCount; ++i)
     {
         const VkMemoryType& memoryType = properties.memoryTypes[i];
-        cout << endl;
-        cout << "#" << i << endl << endl;
-        cout << "Properties";
+        printEndLn();
+        std::cout << "#" << i << std::endl << std::endl;
+        std::cout << "Properties";
         bool hasFlags = false;
         for (const auto bit : {
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -326,31 +323,31 @@ void printDeviceMemoryTypes(magma::PhysicalDevicePtr physicalDevice)
         {
             if (memoryType.propertyFlags & bit)
             {
-                cout << endl;
-                cout << '\t' << magma::helpers::stringize(bit);
+                printEndLn();
+                std::cout << '\t' << magma::helpers::stringize(bit);
                 hasFlags = true;
             }
         }
         if (!hasFlags)
         {
-            cout << endl;
-            cout << '\t' << "---";
+            printEndLn();
+            std::cout << '\t' << "---";
         }
-        cout << endl;
-        cout << "Heap index " << memoryType.heapIndex << endl;
+        printEndLn();
+        std::cout << "Heap index " << memoryType.heapIndex << std::endl;
     }
 }
 
 void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
 {
-    const auto& properties = physicalDevice->getMemoryProperties();
+    const auto properties = physicalDevice->getMemoryProperties();
     for (uint32_t i = 0; i < properties.memoryHeapCount; ++i)
     {
         const VkMemoryHeap& memoryHeap = properties.memoryHeaps[i];
-        cout << endl;
-        cout << "#" << i << endl << endl;
-        cout << "Heap size " << memoryHeap.size << endl;
-        cout << "Heap flags";
+        printEndLn();
+        std::cout << "#" << i << std::endl << std::endl;
+        std::cout << "Heap size " << memoryHeap.size << std::endl;
+        std::cout << "Heap flags";
         bool hasFlags = false;
         for (const auto bit : {
             VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,
@@ -358,304 +355,321 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
         {
             if (memoryHeap.flags & bit)
             {
-                cout << endl;
-                cout << '\t' << magma::helpers::stringize(bit);
+                printEndLn();
+                std::cout << '\t' << magma::helpers::stringize(bit);
                 hasFlags = true;
             }
         }
         if (!hasFlags)
         {
-            cout << endl;
-            cout << '\t' << "---";
+            printEndLn();
+            std::cout << '\t' << "---";
         }
-        cout << endl;
+        printEndLn();
     }
 }
 
-void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, 
-    std::streamsize width)
+void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     const auto features = physicalDevice->checkExtensionFeaturesSupport();
-    cout << setw(width) << left << "Device coherent memory" << booleanString(features.deviceCoherentMemory) << endl;
-    cout << setw(width) << left << "Advanced blend coherent operations" << booleanString(features.advancedBlendCoherentOperations) << endl;
-    cout << setw(width) << left << "Depth clip enable" << booleanString(features.depthClipEnable) << endl;
-    cout << setw(width) << left << "Extended dynamic state" << booleanString(features.extendedDynamicState) << endl;
-    cout << setw(width) << left << "Host query reset" << booleanString(features.hostQueryReset) << endl;
-    cout << setw(width) << left << "Robust image access" << booleanString(features.robustImageAccess) << endl;
-    cout << setw(width) << left << "Index type uint8" << booleanString(features.indexTypeUint8) << endl;
-    cout << setw(width) << left << "Memory priority" << booleanString(features.memoryPriority) << endl;
-    cout << setw(width) << left << "Pipeline creation cache control" << booleanString(features.pipelineCreationCacheControl) << endl;
-    cout << setw(width) << left << "Private data" << booleanString(features.privateData) << endl;
-    cout << setw(width) << left << "Scalar block layout" << booleanString(features.scalarBlockLayout) << endl;
-    cout << setw(width) << left << "Shader demote to helper invocation" << booleanString(features.shaderDemoteToHelperInvocation) << endl;
-    cout << setw(width) << left << "Texel buffer alignment" << booleanString(features.texelBufferAlignment) << endl;
-    cout << setw(width) << left << "YCbCr image arrays" << booleanString(features.ycbcrImageArrays) << endl;
-    cout << setw(width) << left << "Imageless framebuffer" << booleanString(features.imagelessFramebuffer) << endl;
-    cout << setw(width) << left << "Pipeline executable info" << booleanString(features.pipelineExecutableInfo) << endl;
-    cout << setw(width) << left << "Sampler YCbCr conversion" << booleanString(features.samplerYcbcrConversion) << endl;
-    cout << setw(width) << left << "Separate depth stencil layouts" << booleanString(features.separateDepthStencilLayouts) << endl;
-    cout << setw(width) << left << "Shader draw parameters" << booleanString(features.shaderDrawParameters) << endl;
-    cout << setw(width) << left << "Shader subgroup extended types" << booleanString(features.shaderSubgroupExtendedTypes) << endl;
-    cout << setw(width) << left << "Shader terminate invocation" << booleanString(features.shaderTerminateInvocation) << endl;
-    cout << setw(width) << left << "Timeline semaphore" << booleanString(features.timelineSemaphore) << endl;
-    cout << setw(width) << left << "Uniform buffer standard layout" << booleanString(features.uniformBufferStandardLayout) << endl;
-    cout << setw(width) << left << "Corner sampled image" << booleanString(features.cornerSampledImage) << endl;
-    cout << setw(width) << left << "Coverage reduction mode" << booleanString(features.coverageReductionMode) << endl;
-    cout << setw(width) << left << "Dedicated allocation image aliasing" << booleanString(features.dedicatedAllocationImageAliasing) << endl;
-    cout << setw(width) << left << "Diagnostics config" << booleanString(features.diagnosticsConfig) << endl;
-    cout << setw(width) << left << "Fragment shader barycentric" << booleanString(features.fragmentShaderBarycentric) << endl;
-    cout << setw(width) << left << "Representative fragment test" << booleanString(features.representativeFragmentTest) << endl;
-    cout << setw(width) << left << "Exclusive scissor" << booleanString(features.exclusiveScissor) << endl;
-    cout << setw(width) << left << "Image footprint" << booleanString(features.imageFootprint) << endl;
-    cout << setw(width) << left << "Shader streaming multiprocessors" << booleanString(features.shaderSMBuiltins) << endl;
+    setFieldWidth(width);
+    printEndLn();
+    printLn("Device coherent memory", booleanString(features.deviceCoherentMemory));
+    printLn("Advanced blend coherent operations", booleanString(features.advancedBlendCoherentOperations));
+    printLn("Depth clip enable", booleanString(features.depthClipEnable));
+    printLn("Extended dynamic state", booleanString(features.extendedDynamicState));
+    printLn("Host query reset", booleanString(features.hostQueryReset));
+    printLn("Robust image access", booleanString(features.robustImageAccess));
+    printLn("Index type uint8", booleanString(features.indexTypeUint8));
+    printLn("Memory priority", booleanString(features.memoryPriority));
+    printLn("Pipeline creation cache control", booleanString(features.pipelineCreationCacheControl));
+    printLn("Private data", booleanString(features.privateData));
+    printLn("Scalar block layout", booleanString(features.scalarBlockLayout));
+    printLn("Shader demote to helper invocation", booleanString(features.shaderDemoteToHelperInvocation));
+    printLn("Texel buffer alignment", booleanString(features.texelBufferAlignment));
+    printLn("YCbCr image arrays", booleanString(features.ycbcrImageArrays));
+    printLn("Imageless framebuffer", booleanString(features.imagelessFramebuffer));
+    printLn("Pipeline executable info", booleanString(features.pipelineExecutableInfo));
+    printLn("Sampler YCbCr conversion", booleanString(features.samplerYcbcrConversion));
+    printLn("Separate depth stencil layouts", booleanString(features.separateDepthStencilLayouts));
+    printLn("Shader draw parameters", booleanString(features.shaderDrawParameters));
+    printLn("Shader subgroup extended types", booleanString(features.shaderSubgroupExtendedTypes));
+    printLn("Shader terminate invocation", booleanString(features.shaderTerminateInvocation));
+    printLn("Timeline semaphore", booleanString(features.timelineSemaphore));
+    printLn("Uniform buffer standard layout", booleanString(features.uniformBufferStandardLayout));
+    printLn("Corner sampled image", booleanString(features.cornerSampledImage));
+    printLn("Coverage reduction mode", booleanString(features.coverageReductionMode));
+    printLn("Dedicated allocation image aliasing", booleanString(features.dedicatedAllocationImageAliasing));
+    printLn("Diagnostics config", booleanString(features.diagnosticsConfig));
+    printLn("Fragment shader barycentric", booleanString(features.fragmentShaderBarycentric));
+    printLn("Representative fragment test", booleanString(features.representativeFragmentTest));
+    printLn("Exclusive scissor", booleanString(features.exclusiveScissor));
+    printLn("Image footprint", booleanString(features.imageFootprint));
+    printLn("Shader streaming multiprocessors", booleanString(features.shaderSMBuiltins));
 }
 
 void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_EXT_conservative_rasterization
-    const auto& properties = physicalDevice->getConservativeRasterizationProperties();
-    cout << endl;
-    cout << setw(width) << left << "Primitive overestimation size" << properties.primitiveOverestimationSize << endl;
-    cout << setw(width) << left << "Max extra primitive overestimation size" << properties.maxExtraPrimitiveOverestimationSize << endl;
-    cout << setw(width) << left << "Extra primitive overestimation size granularity" << properties.extraPrimitiveOverestimationSizeGranularity << endl;
-    cout << setw(width) << left << "Primitive underestimation" << booleanString(properties.primitiveUnderestimation) << endl;
-    cout << setw(width) << left << "Conservative point and line rasterization" << booleanString(properties.conservativePointAndLineRasterization) << endl;
-    cout << setw(width) << left << "Degenerate triangles rasterized" << booleanString(properties.degenerateTrianglesRasterized) << endl;
-    cout << setw(width) << left << "Degenerate lines rasterized" << booleanString(properties.degenerateLinesRasterized) << endl;
-    cout << setw(width) << left << "Fully covered fragment shader input variable" << booleanString(properties.fullyCoveredFragmentShaderInputVariable) << endl;
-    cout << setw(width) << left << "Conservative rasterization post depth coverage" << booleanString(properties.conservativeRasterizationPostDepthCoverage) << endl;
+    const auto properties = physicalDevice->getConservativeRasterizationProperties();
+    printEndLn();
+    printLn("Primitive overestimation size", properties.primitiveOverestimationSize);
+    printLn("Max extra primitive overestimation size", properties.maxExtraPrimitiveOverestimationSize);
+    printLn("Extra primitive overestimation size granularity", properties.extraPrimitiveOverestimationSizeGranularity);
+    printLn("Primitive underestimation", booleanString(properties.primitiveUnderestimation));
+    printEndLn();
+    printLn("Conservative point and line rasterization", booleanString(properties.conservativePointAndLineRasterization));
+    printLn("Degenerate triangles rasterized", booleanString(properties.degenerateTrianglesRasterized));
+    printLn("Degenerate lines rasterized", booleanString(properties.degenerateLinesRasterized));
+    printEndLn();
+    printLn("Fully covered fragment shader input variable", booleanString(properties.fullyCoveredFragmentShaderInputVariable));
+    printLn("Conservative rasterization post depth coverage", booleanString(properties.conservativeRasterizationPostDepthCoverage));
 #endif // VK_EXT_conservative_rasterization
 }
 
 void printLineRasterizationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     MAGMA_UNUSED(physicalDevice);
-    MAGMA_UNUSED(width);
+    setFieldWidth(width);
 #ifdef VK_EXT_line_rasterization
-    const auto& features = physicalDevice->getLineRasterizationFeatures();
-    cout << endl;
-    cout << setw(width) << left << "Rectangular lines" << booleanString(features.rectangularLines) << endl;
-    cout << setw(width) << left << "Bresenham lines" << booleanString(features.bresenhamLines) << endl;
-    cout << setw(width) << left << "Smooth lines" << booleanString(features.smoothLines) << endl;
-    cout << setw(width) << left << "Stippled rectangular lines" << booleanString(features.stippledRectangularLines) << endl;
-    cout << setw(width) << left << "Stippled Bresenham lines" << booleanString(features.stippledBresenhamLines) << endl;
-    cout << setw(width) << left << "Stippled smooth lines" << booleanString(features.stippledSmoothLines) << endl;
+    const auto features = physicalDevice->getLineRasterizationFeatures();
+    printEndLn();
+    printLn("Rectangular lines", booleanString(features.rectangularLines));
+    printLn("Bresenham lines", booleanString(features.bresenhamLines));
+    printLn("Smooth lines", booleanString(features.smoothLines));
+    printEndLn();
+    printLn("Stippled rectangular lines", booleanString(features.stippledRectangularLines));
+    printLn("Stippled Bresenham lines", booleanString(features.stippledBresenhamLines));
+    printLn("Stippled smooth lines", booleanString(features.stippledSmoothLines));
     const auto& properties = physicalDevice->getLineRasterizationProperties();
-    cout << setw(width) << left << "Line sub-pixel precision bits" << properties.lineSubPixelPrecisionBits << endl;
+    printEndLn();
+    printLn("Line sub-pixel precision bits", properties.lineSubPixelPrecisionBits);
 #endif // VK_EXT_line_rasterization
 }
 
-void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_AMD_shader_core_properties
-    const auto& properties = physicalDevice->getShaderCoreProperties();
-    cout << endl;
-    cout << setw(width) << left << "Shader engine count" << properties.shaderEngineCount << endl;
-    cout << setw(width) << left << "Shader arrays per engine count" << properties.shaderArraysPerEngineCount << endl;
-    cout << setw(width) << left << "Compute units per shader array" << properties.computeUnitsPerShaderArray << endl;
-    cout << setw(width) << left << "SIMD per compute unit" << properties.simdPerComputeUnit << endl;
-    cout << endl;
-    cout << setw(width) << left << "Wavefronts per SIMD" << properties.wavefrontsPerSimd << endl;
-    cout << setw(width) << left << "Wavefront size" << properties.wavefrontSize << endl;
-    cout << endl;
-    cout << setw(width) << left << "SGPRs per SIMD" << properties.sgprsPerSimd << endl;
-    cout << setw(width) << left << "Min SGPR allocations" << properties.minSgprAllocation << endl;
-    cout << setw(width) << left << "Max SGPR allocations" << properties.maxSgprAllocation << endl;
-    cout << setw(width) << left << "SGPR allocation granularity" << properties.sgprAllocationGranularity << endl;
-    cout << endl;
-    cout << setw(width) << left << "VGPRs per SIMD" << properties.vgprsPerSimd << endl;
-    cout << setw(width) << left << "Min VGPR allocation" << properties.minVgprAllocation << endl;
-    cout << setw(width) << left << "Max VGPR allocation" << properties.maxVgprAllocation << endl;
-    cout << setw(width) << left << "VGPR allocation granularity" << properties.vgprAllocationGranularity << endl;
+    const auto properties = physicalDevice->getShaderCoreProperties();
+    printEndLn();
+    printLn("Shader engine count", properties.shaderEngineCount);
+    printLn("Shader arrays per engine count", properties.shaderArraysPerEngineCount);
+    printLn("Compute units per shader array", properties.computeUnitsPerShaderArray);
+    printLn("SIMD per compute unit", properties.simdPerComputeUnit);
+    printEndLn();
+    printLn("Wavefronts per SIMD", properties.wavefrontsPerSimd);
+    printLn("Wavefront size", properties.wavefrontSize);
+    printEndLn();
+    printLn("SGPRs per SIMD", properties.sgprsPerSimd);
+    printLn("Min SGPR allocations", properties.minSgprAllocation);
+    printLn("Max SGPR allocations", properties.maxSgprAllocation);
+    printLn("SGPR allocation granularity", properties.sgprAllocationGranularity);
+    printEndLn();
+    printLn("VGPRs per SIMD", properties.vgprsPerSimd);
+    printLn("Min VGPR allocation", properties.minVgprAllocation);
+    printLn("Max VGPR allocation", properties.maxVgprAllocation);
+    printLn("VGPR allocation granularity", properties.vgprAllocationGranularity);
 #endif // VK_AMD_shader_core_properties
 }
 
-void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_AMD_shader_core_properties2
-    const auto& properties = physicalDevice->getShaderCoreProperties2();
-    cout << endl;
-    cout << setw(width) << left << "Active compute unit count" << properties.activeComputeUnitCount << endl;
+    const auto properties = physicalDevice->getShaderCoreProperties2();
+    printEndLn();
+    printLn("Active compute unit count", properties.activeComputeUnitCount);
 #endif
 }
 
-void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_NV_mesh_shader
-    const auto& features = physicalDevice->getMeshShaderFeatures();
-    const auto& properties = physicalDevice->getMeshShaderProperties();
-    cout << endl;
-    cout << setw(width) << left << "Task shader" << booleanString(features.taskShader) << endl;
-    cout << setw(width) << left << "Mesh shader" << booleanString(features.meshShader) << endl;
-    cout << setw(width) << left << "Max draw mesh task count" << properties.maxDrawMeshTasksCount << endl;
-    cout << setw(width) << left << "Max task work group invocations" << properties.maxTaskWorkGroupInvocations << endl;
-    cout << setw(width) << left << "Max task work group size"
+    const auto features = physicalDevice->getMeshShaderFeatures();
+    printEndLn();
+    printLn("Task shader", booleanString(features.taskShader));
+    printLn("Mesh shader", booleanString(features.meshShader));
+    const auto properties = physicalDevice->getMeshShaderProperties();
+    printEndLn();
+    printLn("Max draw mesh task count", properties.maxDrawMeshTasksCount);
+    printLn("Max task work group invocations", properties.maxTaskWorkGroupInvocations);
+    std::cout << std::setw(width) << std::left << "Max task work group size"
         << properties.maxTaskWorkGroupSize[0] << ", "
         << properties.maxTaskWorkGroupSize[1] << ", "
-        << properties.maxTaskWorkGroupSize[2] << endl;
-    cout << setw(width) << left << "Max task total memory size" << properties.maxTaskTotalMemorySize << endl;
-    cout << setw(width) << left << "Max task output count" << properties.maxTaskOutputCount << endl;
-    cout << setw(width) << left << "Max mesh work group invocations" << properties.maxMeshWorkGroupInvocations << endl;
-    cout << setw(width) << left << "Max mesh work group size"
+        << properties.maxTaskWorkGroupSize[2] << std::endl;
+    printLn("Max task total memory size", properties.maxTaskTotalMemorySize);
+    printLn("Max task output count", properties.maxTaskOutputCount);
+    printLn("Max mesh work group invocations", properties.maxMeshWorkGroupInvocations);
+    std::cout << std::setw(width) << std::left << "Max mesh work group size"
         << properties.maxMeshWorkGroupSize[0] << ", "
         << properties.maxMeshWorkGroupSize[1] << ", "
-        << properties.maxMeshWorkGroupSize[2] <<endl;
-    cout << setw(width) << left << "Max mesh total memory size" << properties.maxMeshTotalMemorySize << endl;
-    cout << setw(width) << left << "Max mesh output vertices" << properties.maxMeshOutputVertices << endl;
-    cout << setw(width) << left << "Max mesh output primitives" << properties.maxMeshOutputPrimitives << endl;
-    cout << setw(width) << left << "Max mesh multiview view count" << properties.maxMeshMultiviewViewCount << endl;
-    cout << setw(width) << left << "Mesh output per vertex granularity" << properties.meshOutputPerVertexGranularity << endl;
-    cout << setw(width) << left << "Mesh output per primitive granularity" << properties.meshOutputPerPrimitiveGranularity << endl;
+        << properties.maxMeshWorkGroupSize[2] << std::endl;
+    printLn("Max mesh total memory size", properties.maxMeshTotalMemorySize);
+    printLn("Max mesh output vertices", properties.maxMeshOutputVertices);
+    printLn("Max mesh output primitives", properties.maxMeshOutputPrimitives);
+    printLn("Max mesh multiview view count", properties.maxMeshMultiviewViewCount);
+    printEndLn();
+    printLn("Mesh output per vertex granularity", properties.meshOutputPerVertexGranularity);
+    printLn("Mesh output per primitive granularity", properties.meshOutputPerPrimitiveGranularity);
 #endif // VK_NV_mesh_shader
 }
 
 void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_EXT_inline_uniform_block
-    const auto& features = physicalDevice->getInlineUniformBlockFeatures();
-    const auto& properties = physicalDevice->getInlineUniformBlockProperties();
-    cout << endl;
-    cout << setw(width) << left << "Inline uniform block" << booleanString(features.inlineUniformBlock) << endl;
-    cout << setw(width) << left << "Descriptor binding inline uniform block update after bind" << booleanString(features.descriptorBindingInlineUniformBlockUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Max inline uniform block size" << properties.maxInlineUniformBlockSize << endl;
-    cout << setw(width) << left << "Max per stage descriptor inline uniform blocks" << properties.maxPerStageDescriptorInlineUniformBlocks << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind inline uniform blocks" << properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks << endl;
-    cout << setw(width) << left << "Max descriptor set inline uniform blocks" << properties.maxDescriptorSetInlineUniformBlocks << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind inline uniform blocks" << properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks << endl;
+    const auto features = physicalDevice->getInlineUniformBlockFeatures();
+    printEndLn();
+    printLn("Inline uniform block", booleanString(features.inlineUniformBlock));
+    printLn("Descriptor binding inline uniform block update after bind", booleanString(features.descriptorBindingInlineUniformBlockUpdateAfterBind));
+    const auto properties = physicalDevice->getInlineUniformBlockProperties();
+    printEndLn();
+    printLn("Max inline uniform block size", properties.maxInlineUniformBlockSize);
+    printLn("Max per stage descriptor inline uniform blocks", properties.maxPerStageDescriptorInlineUniformBlocks);
+    printLn("Max per stage descriptor update after bind inline uniform blocks", properties.maxPerStageDescriptorUpdateAfterBindInlineUniformBlocks);
+    printLn("Max descriptor set inline uniform blocks", properties.maxDescriptorSetInlineUniformBlocks);
+    printLn("Max descriptor set update after bind inline uniform blocks", properties.maxDescriptorSetUpdateAfterBindInlineUniformBlocks);
 #endif // VK_EXT_inline_uniform_block
 }
 
 void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_EXT_descriptor_indexing
-    const auto& features = physicalDevice->getDescriptorIndexingFeatures();
-    cout << setw(width) << left << "Shader input attachment array dynamic indexing" << booleanString(features.shaderInputAttachmentArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader uniform texel buffer array dynamic indexing" << booleanString(features.shaderUniformTexelBufferArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader storage texel buffer array dynamic indexing" << booleanString(features.shaderStorageTexelBufferArrayDynamicIndexing) << endl;
-    cout << setw(width) << left << "Shader uniform buffer array non-uniform indexing" << booleanString(features.shaderUniformBufferArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader sampled image array non-uniform indexing" << booleanString(features.shaderSampledImageArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader storage buffer array non-uniform indexing" << booleanString(features.shaderStorageBufferArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader storage image array non-uniform indexing" << booleanString(features.shaderStorageImageArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader input attachment array non-uniform indexing" << booleanString(features.shaderInputAttachmentArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader uniform texel buffer array non-uniform indexing" << booleanString(features.shaderUniformTexelBufferArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Shader storage texel buffer array non-uniform indexing" << booleanString(features.shaderStorageTexelBufferArrayNonUniformIndexing) << endl;
-    cout << setw(width) << left << "Descriptor binding uniform buffer update after bind" << booleanString(features.descriptorBindingUniformBufferUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding sampled image update after bind" << booleanString(features.descriptorBindingSampledImageUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding storage image update after bind" << booleanString(features.descriptorBindingStorageImageUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding storage buffer update after bind" << booleanString(features.descriptorBindingStorageBufferUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding uniform texel buffer update after bind" << booleanString(features.descriptorBindingUniformTexelBufferUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding storage texel buffer update after bind" << booleanString(features.descriptorBindingStorageTexelBufferUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Descriptor binding update unused while pending" << booleanString(features.descriptorBindingUpdateUnusedWhilePending) << endl;
-    cout << setw(width) << left << "Descriptor binding partially bound" << booleanString(features.descriptorBindingPartiallyBound) << endl;
-    cout << setw(width) << left << "Descriptor binding variable descriptor count" << booleanString(features.descriptorBindingVariableDescriptorCount) << endl;
-    cout << setw(width) << left << "Runtime descriptor array" << booleanString(features.runtimeDescriptorArray) << endl;
-    const auto& properties = physicalDevice->getDescriptorIndexingProperties();
-    cout << setw(width) << left << "Max update after bind descriptors in all pools" << properties.maxUpdateAfterBindDescriptorsInAllPools << endl;
-    cout << setw(width) << left << "Shader uniform buffer array non-uniform indexing native" << booleanString(properties.shaderUniformBufferArrayNonUniformIndexingNative) << endl;
-    cout << setw(width) << left << "Shader sampled image array non-uniform indexing native" << booleanString(properties.shaderSampledImageArrayNonUniformIndexingNative) << endl;
-    cout << setw(width) << left << "Shader storage buffer array non-uniform indexing native" << booleanString(properties.shaderStorageBufferArrayNonUniformIndexingNative) << endl;
-    cout << setw(width) << left << "Shader storage image array non-uniform indexing native" << booleanString(properties.shaderStorageImageArrayNonUniformIndexingNative) << endl;
-    cout << setw(width) << left << "Shader input attachment array non-uniform indexing native" << booleanString(properties.shaderInputAttachmentArrayNonUniformIndexingNative) << endl;
-    cout << setw(width) << left << "Robust buffer access update after bind" << booleanString(properties.robustBufferAccessUpdateAfterBind) << endl;
-    cout << setw(width) << left << "Quad divergent implicit LOD" << booleanString(properties.quadDivergentImplicitLod) << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind samplers" << properties.maxPerStageDescriptorUpdateAfterBindSamplers << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind uniform buffers" << properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind storage buffers" << properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind sampled images" << properties.maxPerStageDescriptorUpdateAfterBindSampledImages << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind storage images" << properties.maxPerStageDescriptorUpdateAfterBindStorageImages << endl;
-    cout << setw(width) << left << "Max per stage descriptor update after bind input attachments" << properties.maxPerStageDescriptorUpdateAfterBindInputAttachments << endl;
-    cout << setw(width) << left << "Max per stage update after bind resources" << properties.maxPerStageUpdateAfterBindResources << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind samplers" << properties.maxDescriptorSetUpdateAfterBindSamplers << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind uniform buffers" << properties.maxDescriptorSetUpdateAfterBindUniformBuffers << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind uniform buffers dynamic" << properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind storage buffers" << properties.maxDescriptorSetUpdateAfterBindStorageBuffers << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind storage buffers dynamic" << properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind sampled images" << properties.maxDescriptorSetUpdateAfterBindSampledImages << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind storage images" << properties.maxDescriptorSetUpdateAfterBindStorageImages << endl;
-    cout << setw(width) << left << "Max descriptor set update after bind input attachments" << properties.maxDescriptorSetUpdateAfterBindInputAttachments << endl;
+    const auto features = physicalDevice->getDescriptorIndexingFeatures();
+    printEndLn();
+    printLn("Shader input attachment array dynamic indexing", booleanString(features.shaderInputAttachmentArrayDynamicIndexing));
+    printLn("Shader uniform texel buffer array dynamic indexing", booleanString(features.shaderUniformTexelBufferArrayDynamicIndexing));
+    printLn("Shader storage texel buffer array dynamic indexing", booleanString(features.shaderStorageTexelBufferArrayDynamicIndexing));
+    printLn("Shader uniform buffer array non-uniform indexing", booleanString(features.shaderUniformBufferArrayNonUniformIndexing));
+    printLn("Shader sampled image array non-uniform indexing", booleanString(features.shaderSampledImageArrayNonUniformIndexing));
+    printLn("Shader storage buffer array non-uniform indexing", booleanString(features.shaderStorageBufferArrayNonUniformIndexing));
+    printLn("Shader storage image array non-uniform indexing", booleanString(features.shaderStorageImageArrayNonUniformIndexing));
+    printLn("Shader input attachment array non-uniform indexing", booleanString(features.shaderInputAttachmentArrayNonUniformIndexing));
+    printLn("Shader uniform texel buffer array non-uniform indexing", booleanString(features.shaderUniformTexelBufferArrayNonUniformIndexing));
+    printLn("Shader storage texel buffer array non-uniform indexing", booleanString(features.shaderStorageTexelBufferArrayNonUniformIndexing));
+    printEndLn();
+    printLn("Descriptor binding uniform buffer update after bind", booleanString(features.descriptorBindingUniformBufferUpdateAfterBind));
+    printLn("Descriptor binding sampled image update after bind", booleanString(features.descriptorBindingSampledImageUpdateAfterBind));
+    printLn("Descriptor binding storage image update after bind", booleanString(features.descriptorBindingStorageImageUpdateAfterBind));
+    printLn("Descriptor binding storage buffer update after bind", booleanString(features.descriptorBindingStorageBufferUpdateAfterBind));
+    printLn("Descriptor binding uniform texel buffer update after bind", booleanString(features.descriptorBindingUniformTexelBufferUpdateAfterBind));
+    printLn("Descriptor binding storage texel buffer update after bind", booleanString(features.descriptorBindingStorageTexelBufferUpdateAfterBind));
+    printLn("Descriptor binding update unused while pending", booleanString(features.descriptorBindingUpdateUnusedWhilePending));
+    printLn("Descriptor binding partially bound", booleanString(features.descriptorBindingPartiallyBound));
+    printLn("Descriptor binding variable descriptor count", booleanString(features.descriptorBindingVariableDescriptorCount));
+    printEndLn();
+    printLn("Runtime descriptor array", booleanString(features.runtimeDescriptorArray));
+    const auto properties = physicalDevice->getDescriptorIndexingProperties();
+    printEndLn();
+    printLn("Max update after bind descriptors in all pools", properties.maxUpdateAfterBindDescriptorsInAllPools);
+    printEndLn();
+    printLn("Shader uniform buffer array non-uniform indexing native", booleanString(properties.shaderUniformBufferArrayNonUniformIndexingNative));
+    printLn("Shader sampled image array non-uniform indexing native", booleanString(properties.shaderSampledImageArrayNonUniformIndexingNative));
+    printLn("Shader storage buffer array non-uniform indexing native", booleanString(properties.shaderStorageBufferArrayNonUniformIndexingNative));
+    printLn("Shader storage image array non-uniform indexing native", booleanString(properties.shaderStorageImageArrayNonUniformIndexingNative));
+    printLn("Shader input attachment array non-uniform indexing native", booleanString(properties.shaderInputAttachmentArrayNonUniformIndexingNative));
+    printEndLn();
+    printLn("Robust buffer access update after bind", booleanString(properties.robustBufferAccessUpdateAfterBind));
+    printLn("Quad divergent implicit LOD", booleanString(properties.quadDivergentImplicitLod));
+    printEndLn();
+    printLn("Max per stage descriptor update after bind samplers", properties.maxPerStageDescriptorUpdateAfterBindSamplers);
+    printLn("Max per stage descriptor update after bind uniform buffers", properties.maxPerStageDescriptorUpdateAfterBindUniformBuffers);
+    printLn("Max per stage descriptor update after bind storage buffers", properties.maxPerStageDescriptorUpdateAfterBindStorageBuffers);
+    printLn("Max per stage descriptor update after bind sampled images", properties.maxPerStageDescriptorUpdateAfterBindSampledImages);
+    printLn("Max per stage descriptor update after bind storage images", properties.maxPerStageDescriptorUpdateAfterBindStorageImages);
+    printLn("Max per stage descriptor update after bind input attachments", properties.maxPerStageDescriptorUpdateAfterBindInputAttachments);
+    printLn("Max per stage update after bind resources", properties.maxPerStageUpdateAfterBindResources);
+    printEndLn();
+    printLn("Max descriptor set update after bind samplers", properties.maxDescriptorSetUpdateAfterBindSamplers);
+    printLn("Max descriptor set update after bind uniform buffers", properties.maxDescriptorSetUpdateAfterBindUniformBuffers);
+    printLn("Max descriptor set update after bind uniform buffers dynamic", properties.maxDescriptorSetUpdateAfterBindUniformBuffersDynamic);
+    printLn("Max descriptor set update after bind storage buffers", properties.maxDescriptorSetUpdateAfterBindStorageBuffers);
+    printLn("Max descriptor set update after bind storage buffers dynamic", properties.maxDescriptorSetUpdateAfterBindStorageBuffersDynamic);
+    printLn("Max descriptor set update after bind sampled images", properties.maxDescriptorSetUpdateAfterBindSampledImages);
+    printLn("Max descriptor set update after bind storage images", properties.maxDescriptorSetUpdateAfterBindStorageImages);
+    printLn("Max descriptor set update after bind input attachments", properties.maxDescriptorSetUpdateAfterBindInputAttachments);
 #endif // VK_EXT_blend_operation_advanced
 }
 
 void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     MAGMA_UNUSED(physicalDevice);
-    MAGMA_UNUSED(width);
+    setFieldWidth(width);
 #ifdef VK_EXT_transform_feedback
-    const auto& features = physicalDevice->getTransformFeedbackFeatures();
-    cout << setw(width) << left << "Transform feedback" << booleanString(features.transformFeedback) << endl;
-    cout << setw(width) << left << "Geometry streams" << booleanString(features.geometryStreams) << endl;
-    const auto& properties = physicalDevice->getTransformFeedbackProperties();
-    cout << setw(width) << left << "Max transform feedback streams" << properties.maxTransformFeedbackStreams << endl;
-    cout << setw(width) << left << "Max transform feedback buffers" << properties.maxTransformFeedbackBuffers << endl;
-    cout << setw(width) << left << "Max transform feedback buffer size" << properties.maxTransformFeedbackBufferSize << endl;
-    cout << setw(width) << left << "Max transform feedback stream data size" << properties.maxTransformFeedbackStreamDataSize << endl;
-    cout << setw(width) << left << "Max transform feedback buffer data size" << properties.maxTransformFeedbackBufferDataSize << endl;
-    cout << setw(width) << left << "Max transform feedback buffer data stride" << properties.maxTransformFeedbackBufferDataStride << endl;
-    cout << setw(width) << left << "Transform feedback queries" << booleanString(properties.transformFeedbackQueries) << endl;
-    cout << setw(width) << left << "Transform feedback streams lines triangles" << booleanString(properties.transformFeedbackStreamsLinesTriangles) << endl;
-    cout << setw(width) << left << "Transform feedback rasterization stream select" << booleanString(properties.transformFeedbackRasterizationStreamSelect) << endl;
-    cout << setw(width) << left << "Transform feedback draw" << booleanString(properties.transformFeedbackDraw) << endl;
+    const auto features = physicalDevice->getTransformFeedbackFeatures();
+    printEndLn();
+    printLn("Transform feedback", booleanString(features.transformFeedback));
+    printLn("Geometry streams", booleanString(features.geometryStreams));
+    const auto properties = physicalDevice->getTransformFeedbackProperties();
+    printEndLn();
+    printLn("Max transform feedback streams", properties.maxTransformFeedbackStreams);
+    printLn("Max transform feedback buffers", properties.maxTransformFeedbackBuffers);
+    printLn("Max transform feedback buffer size", properties.maxTransformFeedbackBufferSize);
+    printLn("Max transform feedback stream data size", properties.maxTransformFeedbackStreamDataSize);
+    printLn("Max transform feedback buffer data size", properties.maxTransformFeedbackBufferDataSize);
+    printLn("Max transform feedback buffer data stride", properties.maxTransformFeedbackBufferDataStride);
+    printEndLn();
+    printLn("Transform feedback queries", booleanString(properties.transformFeedbackQueries));
+    printLn("Transform feedback streams lines triangles", booleanString(properties.transformFeedbackStreamsLinesTriangles));
+    printLn("Transform feedback rasterization stream select", booleanString(properties.transformFeedbackRasterizationStreamSelect));
+    printLn("Transform feedback draw", booleanString(properties.transformFeedbackDraw));
 #endif // VK_EXT_transform_feedback
 }
 
-void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_EXT_blend_operation_advanced
-    const auto& properties = physicalDevice->getBlendOperationAdvancedProperties();
-    cout << setw(width) << left << "Advanced blend max color attachments" << properties.advancedBlendMaxColorAttachments << endl;
-    cout << setw(width) << left << "Advanced blend independent blend" << booleanString(properties.advancedBlendIndependentBlend) << endl;
-    cout << setw(width) << left << "Advanced blend non-premultiplied src color" << booleanString(properties.advancedBlendNonPremultipliedSrcColor) << endl;
-    cout << setw(width) << left << "Advanced blend non-premultiplied dst color" << booleanString(properties.advancedBlendNonPremultipliedDstColor) << endl;
-    cout << setw(width) << left << "Advanced blend correlated overlap" << booleanString(properties.advancedBlendCorrelatedOverlap) << endl;
-    cout << setw(width) << left << "Advanced blend all operations" << booleanString(properties.advancedBlendAllOperations) << endl;
+    const auto properties = physicalDevice->getBlendOperationAdvancedProperties();
+    printEndLn();
+    printLn("Advanced blend max color attachments", properties.advancedBlendMaxColorAttachments);
+    printLn("Advanced blend independent blend", booleanString(properties.advancedBlendIndependentBlend));
+    printLn("Advanced blend non-premultiplied src color", booleanString(properties.advancedBlendNonPremultipliedSrcColor));
+    printLn("Advanced blend non-premultiplied dst color", booleanString(properties.advancedBlendNonPremultipliedDstColor));
+    printLn("Advanced blend correlated overlap", booleanString(properties.advancedBlendCorrelatedOverlap));
+    printLn("Advanced blend all operations", booleanString(properties.advancedBlendAllOperations));
 #endif // VK_EXT_blend_operation_advanced
 }
 
-void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    physicalDevice;
-    width;
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
 #ifdef VK_NV_ray_tracing
-    const auto& properties = physicalDevice->getRayTracingProperties();
-    cout << endl;
-    cout << setw(width) << left << "Shader group handle size" << properties.shaderGroupHandleSize << endl;
-    cout << setw(width) << left << "Max recursion depth" << properties.maxRecursionDepth << endl;
-    cout << setw(width) << left << "Max shader group stride" << properties.maxShaderGroupStride << endl;
-    cout << setw(width) << left << "Shader group base alignment" << properties.shaderGroupBaseAlignment << endl;
-    cout << setw(width) << left << "Max geometry count" << properties.maxGeometryCount << endl;
-    cout << setw(width) << left << "Max instance count" << properties.maxInstanceCount << endl;
-    cout << setw(width) << left << "Max triangle count" << properties.maxTriangleCount << endl;
-    cout << setw(width) << left << "Max descriptor set acceleration structures" << properties.maxDescriptorSetAccelerationStructures << endl;
+    const auto properties = physicalDevice->getRayTracingProperties();
+    printEndLn();
+    printLn("Shader group handle size", properties.shaderGroupHandleSize);
+    printLn("Max recursion depth", properties.maxRecursionDepth);
+    printLn("Max shader group stride", properties.maxShaderGroupStride);
+    printLn("Shader group base alignment", properties.shaderGroupBaseAlignment);
+    printEndLn();
+    printLn("Max geometry count", properties.maxGeometryCount);
+    printLn("Max instance count", properties.maxInstanceCount);
+    printLn("Max triangle count", properties.maxTriangleCount);
+    printLn("Max descriptor set acceleration structures", properties.maxDescriptorSetAccelerationStructures);
 #endif // VK_NV_ray_tracing
 }
 
-void printExtensions(std::shared_ptr<magma::Extensions> extensions,
-    std::streamsize width)
+void printExtensions(std::shared_ptr<magma::Extensions> extensions, std::streamsize width)
 {
-    cout << endl;
+    setFieldWidth(width);
+    printEndLn();
     extensions->forEach(
         [width](const std::string& extensionName, uint32_t specVersion)
         {
-            cout << setw(width) << left << extensionName << "spec version "
-                << specVersion << endl;
+            printLn(extensionName.c_str(), "spec version " + std::to_string(specVersion));
         });
 }
 
@@ -685,94 +699,94 @@ magma::InstancePtr createInstance()
 
 int main()
 {
-    cout << "Vulkan GPU Caps Viewer [Version 1.1]" << endl;
-    cout << "(c) 2018-2021 Victor Coda." << endl;
+    std::cout << "Vulkan GPU Caps Viewer [Version 1.1]" << std::endl;
+    std::cout << "(c) 2018-2021 Victor Coda." << std::endl;
 
     auto instance = createInstance();
     if (!instance)
         return -1;
     auto instanceExtensions = std::make_shared<magma::InstanceExtensions>();
-    cout << endl << "==================== Instance Extensions ====================" << endl;
+    printHeading("Instance Extensions");
     printExtensions(instanceExtensions, 45);
     if (instanceExtensions->KHR_device_group_creation)
     {
-        cout << endl << "==================== Device Groups ====================" << endl;
+        printHeading("Device Groups");
         printDeviceGroups(instance, 45);
     }
     const uint32_t physicalDeviceCount = instance->countPhysicalDevices();
     for (uint32_t deviceId = 0; deviceId < physicalDeviceCount; ++deviceId)
     {
         magma::PhysicalDevicePtr physicalDevice = instance->getPhysicalDevice(deviceId);
-        printDeviceProperties(physicalDevice, deviceId, 15);
-        cout << endl << "==================== Device Features ====================" << endl;
+        printDeviceProperties(physicalDevice, deviceId, 20);
+        printHeading("Device Features");
         printDeviceFeatures(physicalDevice, 45);
-        cout << endl << "==================== Device Limits ====================" << endl;
+        printHeading("Device Limits");
         printDeviceLimits(physicalDevice, 45);
-        cout << endl << "==================== Queue Family Properties ====================" << endl;
+        printHeading("Queue Family Properties");
         printQueueFamilyProperties(physicalDevice, 45);
-        cout << endl << "==================== Device Memory Types ====================" << endl;
+        printHeading("Device Memory Types");
         printDeviceMemoryTypes(physicalDevice);
-        cout << endl << "==================== Device Memory Heaps ====================" << endl;
+        printHeading("Device Memory Heaps");
         printDeviceMemoryHeaps(physicalDevice);
         if (instanceExtensions->KHR_get_physical_device_properties2)
         {
-            cout << endl << "==================== Extension Features ====================" << endl << endl;
+            printHeading("Extension Features");
             printExtensionFeatures(physicalDevice, 40);
         }
         auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
         if (deviceExtensions->EXT_conservative_rasterization)
         {
-            cout << endl << "==================== Conservative Rasterization Properties ====================" << endl;
+            printHeading("Conservative Rasterization Properties");
             printConservativeRasterizationProperties(physicalDevice, 50);
         }
         if (deviceExtensions->EXT_line_rasterization)
         {
-            cout << endl << "==================== Line Rasterization Properties ====================" << endl;
+            printHeading("Line Rasterization Properties");
             printLineRasterizationProperties(physicalDevice, 35);
         }
         if (deviceExtensions->AMD_shader_core_properties)
         {
-            cout << endl << "==================== Shader Core Properties ====================" << endl;
+            printHeading("Shader Core Properties");
             printShaderCoreProperties(physicalDevice, 35);
             if (deviceExtensions->AMD_shader_core_properties2)
                 printExtendedShaderCoreProperties(physicalDevice, 35);
         }
         if (deviceExtensions->NV_mesh_shader)
         {
-            cout << endl << "==================== Mesh Shader Properties ====================" << endl;
+            printHeading("Mesh Shader Properties");
             printMeshShaderProperties(physicalDevice, 40);
         }
         if (deviceExtensions->EXT_inline_uniform_block)
         {
-            cout << endl << "==================== Inline Uniform Block Properties ====================" << endl;
+            printHeading("Inline Uniform Block Properties");
             printInlineUniformBlockProperties(physicalDevice, 65);
         }
         if (deviceExtensions->EXT_descriptor_indexing)
         {
-            cout << endl << "==================== Descriptor Indexing Properties ====================" << endl << endl;
+            printHeading("Descriptor Indexing Properties");
             printDescriptorIndexingProperties(physicalDevice, 65);
         }
         if (deviceExtensions->EXT_transform_feedback)
         {
-            cout << endl << "==================== Transform Feedback Properties ====================" << endl << endl;
+            printHeading("Transform Feedback Properties");
             printTransformFeedbackProperties(physicalDevice, 50);
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
-            cout << endl << "==================== Advanced Blend Operations ====================" << endl << endl;
+            printHeading("Advanced Blend Operations");
             printAdvancedBlendOperationProperties(physicalDevice, 45);
         }
         if (deviceExtensions->NV_ray_tracing)
         {
-            cout << endl << "==================== Ray Tracing Properties ====================" << endl;
+            printHeading("Ray Tracing Properties");
             printRayTracingProperties(physicalDevice, 45);
         }
-        cout << endl << "==================== Device Extensions ====================" << endl;
+        printHeading("Device Extensions");
         printExtensions(deviceExtensions, 45);
         if (physicalDeviceCount > 1 && deviceId < physicalDeviceCount - 1)
         {
-            cout << "Print any key for the next device";
-            cin.get();
+            std::cout << "Print any key for the next device";
+            std::cin.get();
         }
     }
     return 0;
