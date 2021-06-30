@@ -1,6 +1,3 @@
-#include <iomanip>
-#include <iostream>
-#include <climits>
 #include "../magma/magma.h"
 #include "gpucaps.h"
 
@@ -9,6 +6,20 @@ using std::cin;
 using std::endl;
 using std::setw;
 using std::left;
+std::string vendorIDString(uint32_t vendorID)
+{
+    const uint16_t pciVendorID = vendorID & 0xFFFF;
+    switch (pciVendorID)
+    { // https://www.reddit.com/r/vulkan/comments/4ta9nj/is_there_a_comprehensive_list_of_the_names_and/
+    case 0x1002: return "AMD";
+    case 0x1010: return "ImgTec";
+    case 0x10DE: return "NVIDIA";
+    case 0x13B5: return "ARM";
+    case 0x5143: return "Qualcomm";
+    case 0x8086: return "Intel";
+    }
+    return "Unknown";
+}
 
 void printDeviceGroups(magma::InstancePtr instance,
     std::streamsize width)
