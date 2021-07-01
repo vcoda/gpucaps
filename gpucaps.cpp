@@ -602,6 +602,18 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, 
 #endif // VK_EXT_blend_operation_advanced
 }
 
+void printConditionalRenderingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
+#ifdef VK_EXT_conditional_rendering
+    const auto features = physicalDevice->getConditionalRenderingFeatures();
+    printEndLn();
+    printLn("Conditional rendering", booleanString(features.conditionalRendering));
+    printLn("Inherited conditional rendering", booleanString(features.inheritedConditionalRendering));
+#endif // VK_EXT_conditional_rendering
+}
+
 void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     MAGMA_UNUSED(physicalDevice);
@@ -765,6 +777,11 @@ int main()
         {
             printHeading("Descriptor Indexing Properties");
             printDescriptorIndexingProperties(physicalDevice, 65);
+        }
+        if (deviceExtensions->EXT_conditional_rendering)
+        {
+            printHeading("Conditional Rendering");
+            printConditionalRenderingProperties(physicalDevice, 40);
         }
         if (deviceExtensions->EXT_transform_feedback)
         {
