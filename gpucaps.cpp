@@ -639,6 +639,18 @@ void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, s
 #endif // VK_EXT_transform_feedback
 }
 
+void printImageShadingRateProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
+#ifdef VK_NV_shading_rate_image
+    const auto features = physicalDevice->getShadingRateImageFeatures();
+    printEndLn();
+    printLn("Shading rate image", booleanString(features.shadingRateImage));
+    printLn("Shading rate coarse sample order", booleanString(features.shadingRateCoarseSampleOrder));
+#endif // VK_NV_shading_rate_image
+}
+
 void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
     MAGMA_UNUSED(physicalDevice);
@@ -787,6 +799,11 @@ int main()
         {
             printHeading("Transform Feedback Properties");
             printTransformFeedbackProperties(physicalDevice, 50);
+        }
+        if (deviceExtensions->NV_shading_rate_image)
+        {
+            printHeading("Image Shading Rate");
+            printImageShadingRateProperties(physicalDevice, 40);
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
