@@ -48,7 +48,7 @@ void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t dev
 
 void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    const auto& features = physicalDevice->getFeatures();
+    const auto features = physicalDevice->getFeatures();
     setFieldWidth(width);
     printEndLn();
     printLn("Robust buffer access", booleanString(features.robustBufferAccess));
@@ -115,7 +115,7 @@ void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsiz
 
 void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
 {
-    const auto& limits = physicalDevice->getProperties().limits;
+    const auto limits = physicalDevice->getProperties().limits;
     setFieldWidth(width);
     printEndLn();
     printLn("Max image dimension 1D", limits.maxImageDimension1D);
