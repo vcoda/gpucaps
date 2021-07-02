@@ -5,16 +5,6 @@
 
 static std::streamsize fieldWidth = 0;
 
-inline std::string versionString(uint32_t version)
-{
-    uint32_t major = (version >> 22) & 0b1111111111; // 10
-    uint32_t minor = (version >> 12) & 0b1111111111; // 10
-    uint32_t patch = version & 0b111111111111; // 11
-    return std::to_string(major) + "." +
-           std::to_string(minor) + "." +
-           std::to_string(patch);
-}
-
 inline std::string uint32String(uint32_t limit)
 {
     return (UINT_MAX == limit) ? "0xFFFFFFFF" : std::to_string(limit);

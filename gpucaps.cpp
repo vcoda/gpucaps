@@ -1,6 +1,16 @@
 #include "gpucaps.h"
 #include "../magma/magma.h"
 
+std::string versionString(uint32_t version)
+{
+    uint32_t major = VK_VERSION_MAJOR(version);
+    uint32_t minor = VK_VERSION_MINOR(version);
+    uint32_t patch = VK_VERSION_PATCH(version);
+    return std::to_string(major) + "." +
+           std::to_string(minor) + "." +
+           std::to_string(patch);
+}
+
 std::string vendorIDString(uint32_t vendorID)
 {
     const uint16_t pciVendorID = vendorID & 0xFFFF;
@@ -724,6 +734,20 @@ void printExtensions(std::shared_ptr<magma::Extensions> extensions, std::streams
         });
 }
 
+void printInstanceLayers(std::unique_ptr<magma::Layers> layers)
+{
+    printEndLn();
+    std::cout << std::setw(fieldWidth) << std::left << "Name"
+        << std::setw(15) << std::left << "Specification" << "Description" << std::endl;
+    layers->forEach(
+        [](const VkLayerProperties& properties)
+        {
+            std::cout << std::setw(fieldWidth) << std::left << properties.layerName
+                << std::setw(15) << std::left << versionString(properties.specVersion)
+                << properties.description << std::endl;
+        });
+}
+
 magma::InstancePtr createInstance()
 {
     std::vector<const char*> layerNames;
@@ -759,6 +783,9 @@ int main()
     auto instanceExtensions = std::make_shared<magma::InstanceExtensions>();
     printHeading("Instance Extensions");
     printExtensions(instanceExtensions, 45);
+    printHeading("Instance Layers");
+    setFieldWidth(40);
+    printInstanceLayers(std::move(instanceLayers));
     if (instanceExtensions->KHR_device_group_creation)
     {
         printHeading("Device Groups");
