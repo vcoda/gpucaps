@@ -1,14 +1,46 @@
 #include "gpucaps.h"
 #include "../magma/magma.h"
 
-std::string versionString(uint32_t version)
+std::string apiVersionString(uint32_t apiVersion)
 {
-    uint32_t major = VK_VERSION_MAJOR(version);
-    uint32_t minor = VK_VERSION_MINOR(version);
-    uint32_t patch = VK_VERSION_PATCH(version);
+    const uint32_t major = VK_VERSION_MAJOR(apiVersion);
+    const uint32_t minor = VK_VERSION_MINOR(apiVersion);
+    const uint32_t patch = VK_VERSION_PATCH(apiVersion);
     return std::to_string(major) + "." +
            std::to_string(minor) + "." +
            std::to_string(patch);
+}
+
+// The encoding of driverVersion is implementation-defined. It may not use the same encoding as apiVersion.
+// Applications should follow information from the vendor on how to extract the version information from driverVersion.
+std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
+{
+    // https://www.reddit.com/r/vulkan/comments/fmift4/how_to_decode_driverversion_field_of/
+    if (0x10DE == vendorID)
+    {   // NVIDIA
+        const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
+        const uint32_t minor = (driverVersion >> 14) & 0b11111111; // 8
+        const uint32_t patch = (driverVersion >> 6)  & 0b11111111; // 8
+        const uint32_t build = (driverVersion)       & 0b111111; // 6
+        return std::to_string(major) + "." +
+               std::to_string(minor) + "." +
+               std::to_string(patch) + "." +
+               std::to_string(build);
+    } else if (0x8086 == vendorID)
+    {   // Intel
+        const uint32_t major = driverVersion >> 14;
+        const uint32_t minor = driverVersion & 0b11111111111111; // 14
+        return std::to_string(major) + "." +
+               std::to_string(minor);
+    } else
+    {   // AMD & others
+        const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
+        const uint32_t minor = (driverVersion >> 12) & 0b1111111111; // 10
+        const uint32_t patch = (driverVersion)       & 0b111111111111; // 12
+        return std::to_string(major) + "." +
+               std::to_string(minor) + "." +
+               std::to_string(patch);
+    }
 }
 
 std::string vendorIDString(uint32_t vendorID)
@@ -47,11 +79,11 @@ void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t dev
     printHeading((std::string(properties.deviceName) + " (" + std::to_string(deviceId) + ")").c_str());
     printEndLn();
     setFieldWidth(width);
-    printLn("API version", versionString(properties.apiVersion));
-    printLn("Driver version", versionString(properties.driverVersion));
+    printLn("API version", apiVersionString(properties.apiVersion));
+    printLn("Driver version", driverVersionString(properties.driverVersion, properties.vendorID));
     std::cout << std::hex;
-    std::cout << std::setw(width) << std::left << "Vendor ID" << vendorIDString(properties.vendorID) << " (0x" << properties.vendorID << ")" << std::endl;
-    std::cout << std::setw(width) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
+    std::cout << std::setw(fieldWidth) << std::left << "Vendor ID" << "0x" << properties.vendorID << " (" << vendorIDString(properties.vendorID) << ")" << std::endl;
+    std::cout << std::setw(fieldWidth) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
     std::cout << std::dec;
     printLn("Device type", magma::helpers::stringize(properties.deviceType));
 }
@@ -743,7 +775,7 @@ void printInstanceLayers(std::unique_ptr<magma::Layers> layers)
         [](const VkLayerProperties& properties)
         {
             std::cout << std::setw(fieldWidth) << std::left << properties.layerName
-                << std::setw(15) << std::left << versionString(properties.specVersion)
+                << std::setw(15) << std::left << apiVersionString(properties.specVersion)
                 << properties.description << std::endl;
         });
 }
