@@ -773,7 +773,7 @@ int main()
         printDeviceFeatures(physicalDevice, 45);
         printHeading("Device Limits");
         printDeviceLimits(physicalDevice, 45);
-        printHeading("Queue Family Properties");
+        printHeading("Queue Family");
         printQueueFamilyProperties(physicalDevice, 45);
         printHeading("Device Memory Types");
         printDeviceMemoryTypes(physicalDevice);
@@ -797,34 +797,34 @@ int main()
         }
         if (deviceExtensions->EXT_conservative_rasterization)
         {
-            printHeading("Conservative Rasterization Properties");
+            printHeading("Conservative Rasterization");
             printConservativeRasterizationProperties(physicalDevice, 50);
         }
         if (deviceExtensions->EXT_line_rasterization)
         {
-            printHeading("Line Rasterization Properties");
+            printHeading("Line Rasterization");
             printLineRasterizationProperties(physicalDevice, 35);
         }
         if (deviceExtensions->AMD_shader_core_properties)
         {
-            printHeading("Shader Core Properties");
+            printHeading("Shader Core");
             printShaderCoreProperties(physicalDevice, 35);
             if (deviceExtensions->AMD_shader_core_properties2)
                 printExtendedShaderCoreProperties(physicalDevice, 35);
         }
         if (deviceExtensions->NV_mesh_shader)
         {
-            printHeading("Mesh Shader Properties");
+            printHeading("Mesh Shader");
             printMeshShaderProperties(physicalDevice, 40);
         }
         if (deviceExtensions->EXT_inline_uniform_block)
         {
-            printHeading("Inline Uniform Block Properties");
+            printHeading("Inline Uniform Block");
             printInlineUniformBlockProperties(physicalDevice, 65);
         }
         if (deviceExtensions->EXT_descriptor_indexing)
         {
-            printHeading("Descriptor Indexing Properties");
+            printHeading("Descriptor Indexing");
             printDescriptorIndexingProperties(physicalDevice, 65);
         }
         if (deviceExtensions->EXT_conditional_rendering)
@@ -834,7 +834,7 @@ int main()
         }
         if (deviceExtensions->EXT_transform_feedback)
         {
-            printHeading("Transform Feedback Properties");
+            printHeading("Transform Feedback");
             printTransformFeedbackProperties(physicalDevice, 50);
         }
         if (deviceExtensions->NV_shading_rate_image)
@@ -844,12 +844,12 @@ int main()
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
-            printHeading("Advanced Blend Operations");
+            printHeading("Advanced Blend Operation");
             printAdvancedBlendOperationProperties(physicalDevice, 45);
         }
         if (deviceExtensions->NV_ray_tracing)
         {
-            printHeading("Ray Tracing Properties");
+            printHeading("Ray Tracing");
             printRayTracingProperties(physicalDevice, 45);
         }
         printHeading("Device Extensions");
