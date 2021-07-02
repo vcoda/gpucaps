@@ -408,6 +408,33 @@ void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, std::stream
     printLn("Shader streaming multiprocessors", booleanString(features.shaderSMBuiltins));
 }
 
+void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
+#ifdef VK_KHR_8bit_storage
+    const auto features = physicalDevice->get8BitStorageFeatures();
+    printEndLn();
+    printLn("Storage buffer 8-bit access", booleanString(features.storageBuffer8BitAccess));
+    printLn("Uniform and storage buffer 8-bit access", booleanString(features.uniformAndStorageBuffer8BitAccess));
+    printLn("Storage push constant 8-bit members", booleanString(features.storagePushConstant8));
+#endif // VK_KHR_8bit_storage
+}
+
+void print16BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+{
+    MAGMA_UNUSED(physicalDevice);
+    setFieldWidth(width);
+#ifdef VK_KHR_16bit_storage
+    const auto features = physicalDevice->get16BitStorageFeatures();
+    printEndLn();
+    printLn("Storage buffer 16-bit access", booleanString(features.storageBuffer16BitAccess));
+    printLn("Uniform and storage buffer 16-bit access", booleanString(features.uniformAndStorageBuffer16BitAccess));
+    printLn("Storage push constant 16-bit members", booleanString(features.storagePushConstant16));
+    printLn("Storage input/output 16-bit members", booleanString(features.storageInputOutput16));
+#endif // VK_KHR_16bit_storage
+}
+
 void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice,
     std::streamsize width)
 {
@@ -758,6 +785,16 @@ int main()
             printExtensionFeatures(physicalDevice, 40);
         }
         auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
+        if (deviceExtensions->KHR_8bit_storage)
+        {
+            printHeading("8-bit Storage");
+            print8BitStorageProperties(physicalDevice, 45);
+        }
+        if (deviceExtensions->KHR_16bit_storage)
+        {
+            printHeading("16-bit Storage");
+            print16BitStorageProperties(physicalDevice, 45);
+        }
         if (deviceExtensions->EXT_conservative_rasterization)
         {
             printHeading("Conservative Rasterization Properties");
