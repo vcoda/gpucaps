@@ -1,5 +1,5 @@
 #include "gpucaps.h"
-#include "../magma/magma.h"
+#include "third-party/magma/magma.h"
 
 std::string apiVersionString(uint32_t apiVersion)
 {
