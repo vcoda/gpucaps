@@ -3,7 +3,7 @@
 #include <string>
 #include <climits>
 
-static std::streamsize fieldWidth = 0;
+static std::streamsize width = 0;
 
 inline std::string uint32String(uint32_t limit)
 {
@@ -16,15 +16,15 @@ inline std::string booleanString(Bool value)
     return value ? "Yes" : "No";
 }
 
-inline void setFieldWidth(std::streamsize width)
+inline void setFieldWidth(std::streamsize fieldWidth)
 {
-    fieldWidth = width;
+    width = fieldWidth;
 }
 
 template<typename Type>
 inline void printLn(const char *description, const Type& value)
 {
-    std::cout << std::setw(fieldWidth) << std::left << description << value << std::endl;
+    std::cout << std::setw(width) << std::left << description << value << std::endl;
 }
 
 template<typename Type>
@@ -43,7 +43,7 @@ inline void printArray(const Type& arg, Args... args)
 template<typename... Args>
 inline void printLn(const char *description, Args... args)
 {
-    std::cout << std::setw(fieldWidth) << std::left << description << "[";
+    std::cout << std::setw(width) << std::left << description << "[";
     printArray(args...);
     std::cout << std::endl;
 }

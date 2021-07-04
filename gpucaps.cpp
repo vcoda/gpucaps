@@ -58,7 +58,7 @@ std::string vendorIDString(uint32_t vendorID)
     return "Unknown";
 }
 
-void printDeviceGroups(magma::InstancePtr instance, std::streamsize width)
+void printDeviceGroups(magma::InstancePtr instance)
 {
     const auto physicalDeviceGroups = instance->enumeratePhysicalDeviceGroups();
     uint32_t physicalGroupIndex = 0;
@@ -66,32 +66,29 @@ void printDeviceGroups(magma::InstancePtr instance, std::streamsize width)
     {
         printEndLn();
         std::cout << "#" << physicalGroupIndex++ << std::endl << std::endl;
-        setFieldWidth(width);
         printLn("Physical device count ", physicalDeviceGroup.physicalDeviceCount);
         printLn("Subset allocation", booleanString(physicalDeviceGroup.subsetAllocation));
         printEndLn();
     }
 }
 
-void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t deviceId, std::streamsize width)
+void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t deviceId)
 {
     const auto properties = physicalDevice->getProperties();
     printHeading((std::string(properties.deviceName) + " (" + std::to_string(deviceId) + ")").c_str());
     printEndLn();
-    setFieldWidth(width);
     printLn("API version", apiVersionString(properties.apiVersion));
     printLn("Driver version", driverVersionString(properties.driverVersion, properties.vendorID));
     std::cout << std::hex;
-    std::cout << std::setw(fieldWidth) << std::left << "Vendor ID" << "0x" << properties.vendorID << " (" << vendorIDString(properties.vendorID) << ")" << std::endl;
-    std::cout << std::setw(fieldWidth) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
+    std::cout << std::setw(width) << std::left << "Vendor ID" << "0x" << properties.vendorID << " (" << vendorIDString(properties.vendorID) << ")" << std::endl;
+    std::cout << std::setw(width) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
     std::cout << std::dec;
     printLn("Device type", magma::helpers::stringize(properties.deviceType));
 }
 
-void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice)
 {
     const auto features = physicalDevice->getFeatures();
-    setFieldWidth(width);
     printEndLn();
     printLn("Robust buffer access", booleanString(features.robustBufferAccess));
     printLn("Full draw index Uint32", booleanString(features.fullDrawIndexUint32));
@@ -155,10 +152,9 @@ void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsiz
     printLn("Inherited queries", booleanString(features.inheritedQueries));
 }
 
-void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice)
 {
     const auto limits = physicalDevice->getProperties().limits;
-    setFieldWidth(width);
     printEndLn();
     printLn("Max image dimension 1D", limits.maxImageDimension1D);
     printLn("Max image dimension 2D", limits.maxImageDimension2D);
@@ -202,7 +198,6 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printEndLn();
     printLn("Max tessellation generation level", limits.maxTessellationGenerationLevel);
     printLn("Max tessellation patchSize", limits.maxTessellationPatchSize);
-    setFieldWidth(width + 10);
     printEndLn();
     printLn("Max tessellation control per vertex input components", limits.maxTessellationControlPerVertexInputComponents);
     printLn("Max tessellation control per vertex output components", limits.maxTessellationControlPerVertexOutputComponents);
@@ -210,7 +205,6 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printLn("Max tessellation control total output components", limits.maxTessellationControlTotalOutputComponents);
     printLn("Max tessellation evaluation input components", limits.maxTessellationEvaluationInputComponents);
     printLn("Max tessellation evaluation output components", limits.maxTessellationEvaluationOutputComponents);
-    setFieldWidth(width);
     printEndLn();
     printLn("Max geometry shader invocations", limits.maxGeometryShaderInvocations);
     printLn("Max geometry input components", limits.maxGeometryInputComponents);
@@ -224,15 +218,15 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printLn("Max fragment combined output resources", uint32String(limits.maxFragmentCombinedOutputResources));
     printEndLn();
     printLn("Max compute shared memory size", limits.maxComputeSharedMemorySize);
-    std::cout << std::setw(width) << std::left << "Max compute workgroup count" << "[" <<
-        limits.maxComputeWorkGroupCount[0] << ", " <<
-        limits.maxComputeWorkGroupCount[1] << ", " <<
-        limits.maxComputeWorkGroupCount[2] << "]" << std::endl;
-    std::cout << std::setw(width) << std::left << "Max compute workgroup invocations" << limits.maxComputeWorkGroupInvocations << std::endl;
-    std::cout << std::setw(width) << std::left << "Max compute workgroup size" << "[" <<
-        limits.maxComputeWorkGroupSize[0] << ", " <<
-        limits.maxComputeWorkGroupSize[1] << ", " <<
-        limits.maxComputeWorkGroupSize[2] << "]" << std::endl;
+    printLn("Max compute workgroup count",
+        limits.maxComputeWorkGroupCount[0],
+        limits.maxComputeWorkGroupCount[1],
+        limits.maxComputeWorkGroupCount[2]);
+    printLn("Max compute workgroup invocations", limits.maxComputeWorkGroupInvocations);
+    printLn("Max compute workgroup size",
+        limits.maxComputeWorkGroupSize[0],
+        limits.maxComputeWorkGroupSize[1],
+        limits.maxComputeWorkGroupSize[2]);
     printEndLn();
     printLn("Sub-pixel precision bits", limits.subPixelPrecisionBits);
     printLn("Sub-texel precision bits ", limits.subTexelPrecisionBits);
@@ -245,12 +239,8 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printLn("Max sampler anisotropy", limits.maxSamplerAnisotropy);
     printEndLn();
     printLn("Max viewports", limits.maxViewports);
-    std::cout << std::setw(width) << std::left << "Max viewport dimensions" << "[" <<
-        limits.maxViewportDimensions[0] << ", " <<
-        limits.maxViewportDimensions[1] << "]" << std::endl;
-    std::cout << std::setw(width) << std::left << "Viewport bounds range" << "[" <<
-        limits.viewportBoundsRange[0] << ", " <<
-        limits.viewportBoundsRange[1] << "]" << std::endl;
+    printLn("Max viewport dimensions", limits.maxViewportDimensions[0], limits.maxViewportDimensions[1]);
+    printLn("Viewport bounds range", limits.viewportBoundsRange[0], limits.viewportBoundsRange[1]);
     printLn("Viewport sub-pixel bits", limits.viewportSubPixelBits);
     printEndLn();
     printLn("Min memory map alignment", limits.minMemoryMapAlignment);
@@ -291,12 +281,8 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printEndLn();
     printLn("Discrete queue priorities", limits.discreteQueuePriorities);
     printEndLn();
-    std::cout << std::setw(width) << std::left << "Point size range" << "[" <<
-        limits.pointSizeRange[0] << ", " <<
-        limits.pointSizeRange[1] << "]" << std::endl;
-    std::cout << std::setw(width) << std::left << "Line width range" << "[" <<
-        limits.lineWidthRange[0] << ", " <<
-        limits.lineWidthRange[1] << "]" << std::endl;
+    printLn("Point size range", limits.pointSizeRange[0], limits.pointSizeRange[1]);
+    printLn("Line width range", limits.lineWidthRange[0], limits.lineWidthRange[1]);
     printLn("Point size granularity", limits.pointSizeGranularity);
     printLn("Line width granularity", limits.lineWidthGranularity);
     printLn("Strict lines", booleanString(limits.strictLines));
@@ -307,9 +293,8 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice, std::streamsize 
     printLn("Non-coherent atom size", limits.nonCoherentAtomSize);
 }
 
-void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice)
 {
-    setFieldWidth(width);
     const auto queueFamilyProperties = physicalDevice->getQueueFamilyProperties();
     uint32_t queueFamilyIndex = 0;
     for (const auto& properties : queueFamilyProperties)
@@ -332,12 +317,12 @@ void printQueueFamilyProperties(magma::PhysicalDevicePtr physicalDevice, std::st
         printEndLn();
         printLn("Queue count", properties.queueCount);
         printLn("Timestamp valid bits", properties.timestampValidBits);
-        std::cout << std::setw(width) << std::left << "Min image transfer granularity" << "[" <<
-            properties.minImageTransferGranularity.width << ", " <<
-            properties.minImageTransferGranularity.height << ", " <<
-            properties.minImageTransferGranularity.depth << "]" << std::endl;
+        printLn("Min image transfer granularity",
+            properties.minImageTransferGranularity.width,
+            properties.minImageTransferGranularity.height,
+            properties.minImageTransferGranularity.depth);
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        // On Win32 doesn't requires display and visual ID
+        // On Win32 we don't need display and visual ID
         const bool supportsPresentation = physicalDevice->getPresentationSupport(queueFamilyIndex, nullptr);
         printLn("Supports presentation", booleanString(supportsPresentation));
 #endif
@@ -411,10 +396,9 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
     }
 }
 
-void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice)
 {
     const auto features = physicalDevice->checkExtensionFeaturesSupport();
-    setFieldWidth(width);
     printEndLn();
     printLn("Device coherent memory", booleanString(features.deviceCoherentMemory));
     printLn("Advanced blend coherent operations", booleanString(features.advancedBlendCoherentOperations));
@@ -450,10 +434,9 @@ void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice, std::stream
     printLn("Shader streaming multiprocessors", booleanString(features.shaderSMBuiltins));
 }
 
-void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_KHR_8bit_storage
     const auto features = physicalDevice->get8BitStorageFeatures();
     printEndLn();
@@ -463,10 +446,9 @@ void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::st
 #endif // VK_KHR_8bit_storage
 }
 
-void print16BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void print16BitStorageProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_KHR_16bit_storage
     const auto features = physicalDevice->get16BitStorageFeatures();
     printEndLn();
@@ -477,11 +459,9 @@ void print16BitStorageProperties(magma::PhysicalDevicePtr physicalDevice, std::s
 #endif // VK_KHR_16bit_storage
 }
 
-void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice,
-    std::streamsize width)
+void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_conservative_rasterization
     const auto properties = physicalDevice->getConservativeRasterizationProperties();
     printEndLn();
@@ -499,10 +479,9 @@ void printConservativeRasterizationProperties(magma::PhysicalDevicePtr physicalD
 #endif // VK_EXT_conservative_rasterization
 }
 
-void printLineRasterizationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printLineRasterizationProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_line_rasterization
     const auto features = physicalDevice->getLineRasterizationFeatures();
     printEndLn();
@@ -519,10 +498,9 @@ void printLineRasterizationProperties(magma::PhysicalDevicePtr physicalDevice, s
 #endif // VK_EXT_line_rasterization
 }
 
-void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_AMD_shader_core_properties
     const auto properties = physicalDevice->getShaderCoreProperties();
     printEndLn();
@@ -546,10 +524,9 @@ void printShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, std::str
 #endif // VK_AMD_shader_core_properties
 }
 
-void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_AMD_shader_core_properties2
     const auto properties = physicalDevice->getShaderCoreProperties2();
     printEndLn();
@@ -557,10 +534,9 @@ void printExtendedShaderCoreProperties(magma::PhysicalDevicePtr physicalDevice, 
 #endif
 }
 
-void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_NV_mesh_shader
     const auto features = physicalDevice->getMeshShaderFeatures();
     printEndLn();
@@ -569,18 +545,20 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice, std::str
     const auto properties = physicalDevice->getMeshShaderProperties();
     printEndLn();
     printLn("Max draw mesh task count", properties.maxDrawMeshTasksCount);
+    printEndLn();
     printLn("Max task work group invocations", properties.maxTaskWorkGroupInvocations);
-    std::cout << std::setw(width) << std::left << "Max task work group size"
-        << properties.maxTaskWorkGroupSize[0] << ", "
-        << properties.maxTaskWorkGroupSize[1] << ", "
-        << properties.maxTaskWorkGroupSize[2] << std::endl;
+    printLn("Max task work group size",
+        properties.maxTaskWorkGroupSize[0],
+        properties.maxTaskWorkGroupSize[1],
+        properties.maxTaskWorkGroupSize[2]);
     printLn("Max task total memory size", properties.maxTaskTotalMemorySize);
     printLn("Max task output count", properties.maxTaskOutputCount);
+    printEndLn();
     printLn("Max mesh work group invocations", properties.maxMeshWorkGroupInvocations);
-    std::cout << std::setw(width) << std::left << "Max mesh work group size"
-        << properties.maxMeshWorkGroupSize[0] << ", "
-        << properties.maxMeshWorkGroupSize[1] << ", "
-        << properties.maxMeshWorkGroupSize[2] << std::endl;
+    printLn("Max mesh work group size",
+        properties.maxMeshWorkGroupSize[0],
+        properties.maxMeshWorkGroupSize[1],
+        properties.maxMeshWorkGroupSize[2]);
     printLn("Max mesh total memory size", properties.maxMeshTotalMemorySize);
     printLn("Max mesh output vertices", properties.maxMeshOutputVertices);
     printLn("Max mesh output primitives", properties.maxMeshOutputPrimitives);
@@ -591,10 +569,9 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice, std::str
 #endif // VK_NV_mesh_shader
 }
 
-void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_inline_uniform_block
     const auto features = physicalDevice->getInlineUniformBlockFeatures();
     printEndLn();
@@ -610,10 +587,9 @@ void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice, 
 #endif // VK_EXT_inline_uniform_block
 }
 
-void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_descriptor_indexing
     const auto features = physicalDevice->getDescriptorIndexingFeatures();
     printEndLn();
@@ -671,10 +647,9 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice, 
 #endif // VK_EXT_blend_operation_advanced
 }
 
-void printConditionalRenderingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printConditionalRenderingProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_conditional_rendering
     const auto features = physicalDevice->getConditionalRenderingFeatures();
     printEndLn();
@@ -683,10 +658,9 @@ void printConditionalRenderingProperties(magma::PhysicalDevicePtr physicalDevice
 #endif // VK_EXT_conditional_rendering
 }
 
-void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_transform_feedback
     const auto features = physicalDevice->getTransformFeedbackFeatures();
     printEndLn();
@@ -708,10 +682,9 @@ void printTransformFeedbackProperties(magma::PhysicalDevicePtr physicalDevice, s
 #endif // VK_EXT_transform_feedback
 }
 
-void printImageShadingRateProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printImageShadingRateProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_NV_shading_rate_image
     const auto features = physicalDevice->getShadingRateImageFeatures();
     printEndLn();
@@ -720,10 +693,9 @@ void printImageShadingRateProperties(magma::PhysicalDevicePtr physicalDevice, st
 #endif // VK_NV_shading_rate_image
 }
 
-void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_EXT_blend_operation_advanced
     const auto properties = physicalDevice->getBlendOperationAdvancedProperties();
     printEndLn();
@@ -736,10 +708,9 @@ void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevi
 #endif // VK_EXT_blend_operation_advanced
 }
 
-void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice, std::streamsize width)
+void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
-    setFieldWidth(width);
 #ifdef VK_NV_ray_tracing
     const auto properties = physicalDevice->getRayTracingProperties();
     printEndLn();
@@ -755,36 +726,35 @@ void printRayTracingProperties(magma::PhysicalDevicePtr physicalDevice, std::str
 #endif // VK_NV_ray_tracing
 }
 
-void printExtensions(std::shared_ptr<magma::Extensions> extensions, std::streamsize width)
+void printExtensions(std::shared_ptr<magma::Extensions> extensions)
 {
-    setFieldWidth(width);
     printEndLn();
+    printLn("Name", "Specification");
     extensions->forEach(
-        [width](const std::string& extensionName, uint32_t specVersion)
+        [](const std::string& extensionName, uint32_t specVersion)
         {
-            printLn(extensionName.c_str(), "spec version " + std::to_string(specVersion));
+            printLn(extensionName.c_str(), specVersion);
         });
 }
 
-void printInstanceLayers(std::unique_ptr<magma::Layers> layers)
+void printInstanceLayers(std::shared_ptr<magma::InstanceLayers> instanceLayers)
 {
     printEndLn();
-    std::cout << std::setw(fieldWidth) << std::left << "Name"
+    std::cout << std::setw(width) << std::left << "Name"
         << std::setw(15) << std::left << "Specification" << "Description" << std::endl;
-    layers->forEach(
+    instanceLayers->forEach(
         [](const VkLayerProperties& properties)
         {
-            std::cout << std::setw(fieldWidth) << std::left << properties.layerName
+            std::cout << std::setw(width) << std::left << properties.layerName
                 << std::setw(15) << std::left << apiVersionString(properties.specVersion)
                 << properties.description << std::endl;
         });
 }
 
-magma::InstancePtr createInstance()
+magma::InstancePtr createInstance(std::shared_ptr<magma::InstanceLayers> instanceLayers)
 {
     std::vector<const char*> layerNames;
 #ifdef _DEBUG
-    std::unique_ptr<magma::InstanceLayers> instanceLayers = std::make_unique<magma::InstanceLayers>();
     if (instanceLayers->KHRONOS_validation)
         layerNames.push_back("VK_LAYER_KHRONOS_validation");
     else if (instanceLayers->LUNARG_standard_validation)
@@ -809,31 +779,38 @@ int main()
     std::cout << "Vulkan GPU Caps Viewer [Version 1.1]" << std::endl;
     std::cout << "(c) 2018-2021 Victor Coda." << std::endl;
 
-    auto instance = createInstance();
+    auto instanceLayers = std::make_shared<magma::InstanceLayers>();
+    auto instance = createInstance(instanceLayers);
     if (!instance)
         return -1;
     auto instanceExtensions = std::make_shared<magma::InstanceExtensions>();
     printHeading("Instance Extensions");
-    printExtensions(instanceExtensions, 45);
+    setFieldWidth(45);
+    printExtensions(instanceExtensions);
     printHeading("Instance Layers");
     setFieldWidth(40);
     printInstanceLayers(std::move(instanceLayers));
     if (instanceExtensions->KHR_device_group_creation)
     {
         printHeading("Device Groups");
-        printDeviceGroups(instance, 45);
+        setFieldWidth(30);
+        printDeviceGroups(instance);
     }
     const uint32_t physicalDeviceCount = instance->countPhysicalDevices();
     for (uint32_t deviceId = 0; deviceId < physicalDeviceCount; ++deviceId)
     {
         magma::PhysicalDevicePtr physicalDevice = instance->getPhysicalDevice(deviceId);
-        printDeviceProperties(physicalDevice, deviceId, 20);
+        setFieldWidth(20);
+        printDeviceProperties(physicalDevice, deviceId);
         printHeading("Device Features");
-        printDeviceFeatures(physicalDevice, 45);
+        setFieldWidth(45);
+        printDeviceFeatures(physicalDevice);
         printHeading("Device Limits");
-        printDeviceLimits(physicalDevice, 45);
+        setFieldWidth(55);
+        printDeviceLimits(physicalDevice);
         printHeading("Queue Family");
-        printQueueFamilyProperties(physicalDevice, 45);
+        setFieldWidth(40);
+        printQueueFamilyProperties(physicalDevice);
         printHeading("Device Memory Types");
         printDeviceMemoryTypes(physicalDevice);
         printHeading("Device Memory Heaps");
@@ -841,78 +818,93 @@ int main()
         if (instanceExtensions->KHR_get_physical_device_properties2)
         {
             printHeading("Extension Features");
-            printExtensionFeatures(physicalDevice, 40);
+            setFieldWidth(40);
+            printExtensionFeatures(physicalDevice);
         }
         auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
         if (deviceExtensions->KHR_8bit_storage)
         {
             printHeading("8-bit Storage");
-            print8BitStorageProperties(physicalDevice, 45);
+            setFieldWidth(45);
+            print8BitStorageProperties(physicalDevice);
         }
         if (deviceExtensions->KHR_16bit_storage)
         {
             printHeading("16-bit Storage");
-            print16BitStorageProperties(physicalDevice, 45);
+            setFieldWidth(45);
+            print16BitStorageProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_conservative_rasterization)
         {
             printHeading("Conservative Rasterization");
-            printConservativeRasterizationProperties(physicalDevice, 50);
+            setFieldWidth(50);
+            printConservativeRasterizationProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_line_rasterization)
         {
             printHeading("Line Rasterization");
-            printLineRasterizationProperties(physicalDevice, 35);
+            setFieldWidth(35);
+            printLineRasterizationProperties(physicalDevice);
         }
         if (deviceExtensions->AMD_shader_core_properties)
         {
             printHeading("Shader Core");
-            printShaderCoreProperties(physicalDevice, 35);
+            setFieldWidth(35);
+            printShaderCoreProperties(physicalDevice);
             if (deviceExtensions->AMD_shader_core_properties2)
-                printExtendedShaderCoreProperties(physicalDevice, 35);
+                printExtendedShaderCoreProperties(physicalDevice);
         }
         if (deviceExtensions->NV_mesh_shader)
         {
             printHeading("Mesh Shader");
-            printMeshShaderProperties(physicalDevice, 40);
+            setFieldWidth(40);
+            printMeshShaderProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_inline_uniform_block)
         {
             printHeading("Inline Uniform Block");
-            printInlineUniformBlockProperties(physicalDevice, 65);
+            setFieldWidth(65);
+            printInlineUniformBlockProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_descriptor_indexing)
         {
             printHeading("Descriptor Indexing");
-            printDescriptorIndexingProperties(physicalDevice, 65);
+            setFieldWidth(65);
+            printDescriptorIndexingProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_conditional_rendering)
         {
             printHeading("Conditional Rendering");
-            printConditionalRenderingProperties(physicalDevice, 40);
+            setFieldWidth(35);
+            printConditionalRenderingProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_transform_feedback)
         {
             printHeading("Transform Feedback");
-            printTransformFeedbackProperties(physicalDevice, 50);
+            setFieldWidth(50);
+            printTransformFeedbackProperties(physicalDevice);
         }
         if (deviceExtensions->NV_shading_rate_image)
         {
             printHeading("Image Shading Rate");
-            printImageShadingRateProperties(physicalDevice, 40);
+            setFieldWidth(35);
+            printImageShadingRateProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
             printHeading("Advanced Blend Operation");
-            printAdvancedBlendOperationProperties(physicalDevice, 45);
+            setFieldWidth(45);
+            printAdvancedBlendOperationProperties(physicalDevice);
         }
         if (deviceExtensions->NV_ray_tracing)
         {
             printHeading("Ray Tracing");
-            printRayTracingProperties(physicalDevice, 45);
+            setFieldWidth(45);
+            printRayTracingProperties(physicalDevice);
         }
         printHeading("Device Extensions");
-        printExtensions(deviceExtensions, 45);
+        setFieldWidth(45);
+        printExtensions(deviceExtensions);
         if (physicalDeviceCount > 1 && deviceId < physicalDeviceCount - 1)
         {
             std::cout << "Print any key for the next device";
