@@ -27,6 +27,27 @@ inline void printLn(const char *description, const Type& value)
     std::cout << std::setw(fieldWidth) << std::left << description << value << std::endl;
 }
 
+template<typename Type>
+inline void printArray(const Type& arg)
+{
+    std::cout << arg << "]";
+}
+
+template<typename Type, typename... Args>
+inline void printArray(const Type& arg, Args... args)
+{
+    std::cout << arg << ", ";
+    printArray(args...);
+}
+
+template<typename... Args>
+inline void printLn(const char *description, Args... args)
+{
+    std::cout << std::setw(fieldWidth) << std::left << description << "[";
+    printArray(args...);
+    std::cout << std::endl;
+}
+
 inline void printEndLn()
 {
     std::cout << std::endl;
