@@ -7,7 +7,9 @@ static std::streamsize width = 0;
 
 inline std::string uint32String(uint32_t limit)
 {
-    return (UINT_MAX == limit) ? "0xFFFFFFFF" : std::to_string(limit);
+    return (UINT_MAX == limit) ? "0xFFFFFFFF"
+        : (USHRT_MAX == limit) ? "0xFFFF"
+        : std::to_string(limit);
 }
 
 template<typename Bool>
