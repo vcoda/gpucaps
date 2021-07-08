@@ -693,6 +693,21 @@ void printImageShadingRateProperties(magma::PhysicalDevicePtr physicalDevice)
 #endif // VK_NV_shading_rate_image
 }
 
+void printMultiviewProperties(magma::PhysicalDevicePtr physicalDevice)
+{
+#ifdef VK_KHR_multiview
+    const auto features = physicalDevice->getMultiviewFeatures();
+    printEndLn();
+    printLn("Multiview", booleanString(features.multiview));
+    printLn("Multiview geometry shader", booleanString(features.multiviewGeometryShader));
+    printLn("Multiview tessellation shader", booleanString(features.multiviewTessellationShader));
+    const auto properties = physicalDevice->getMultiviewProperties();
+    printEndLn();
+    printLn("Max multiview view count", properties.maxMultiviewViewCount);
+    printLn("Max multiview instance index", properties.maxMultiviewInstanceIndex);
+#endif // VK_KHR_multiview
+}
+
 void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
@@ -889,6 +904,12 @@ int main()
             printHeading("Image Shading Rate");
             setFieldWidth(35);
             printImageShadingRateProperties(physicalDevice);
+        }
+        if (deviceExtensions->KHR_multiview)
+        {
+            printHeading("Multi View");
+            setFieldWidth(35);
+            printMultiviewProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
