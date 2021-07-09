@@ -86,6 +86,22 @@ void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t dev
     printLn("Device type", magma::helpers::stringize(properties.deviceType));
 }
 
+void printDriverProperties(magma::PhysicalDevicePtr physicalDevice)
+{
+#ifdef VK_KHR_driver_properties
+    const auto properties = physicalDevice->getDriverProperties();
+    printEndLn();
+    printLn("Driver ID", properties.driverID);
+    printLn("Driver name", properties.driverName);
+    printLn("Driver info", properties.driverInfo);
+    std::cout << std::setw(width) << std::left << "Conformance version"
+        << (uint32_t)properties.conformanceVersion.major << "."
+        << (uint32_t)properties.conformanceVersion.minor << "."
+        << (uint32_t)properties.conformanceVersion.subminor << "."
+        << (uint32_t)properties.conformanceVersion.patch << std::endl;
+#endif // VK_KHR_driver_properties
+}
+
 void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice)
 {
     const auto features = physicalDevice->getFeatures();
@@ -827,6 +843,13 @@ int main()
         magma::PhysicalDevicePtr physicalDevice = instance->getPhysicalDevice(deviceId);
         setFieldWidth(20);
         printDeviceProperties(physicalDevice, deviceId);
+        auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
+        if (deviceExtensions->KHR_driver_properties)
+        {
+            printHeading("Driver Properties");
+            setFieldWidth(20);
+            printDriverProperties(physicalDevice);
+        }
         printHeading("Device Features");
         setFieldWidth(45);
         printDeviceFeatures(physicalDevice);
@@ -846,7 +869,6 @@ int main()
             setFieldWidth(40);
             printExtensionFeatures(physicalDevice);
         }
-        auto deviceExtensions = std::make_shared<magma::PhysicalDeviceExtensions>(physicalDevice);
         if (deviceExtensions->KHR_8bit_storage)
         {
             printHeading("8-bit Storage");
