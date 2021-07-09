@@ -107,7 +107,7 @@ void printDeviceFeatures(magma::PhysicalDevicePtr physicalDevice)
     const auto features = physicalDevice->getFeatures();
     printEndLn();
     printLn("Robust buffer access", booleanString(features.robustBufferAccess));
-    printLn("Full draw index Uint32", booleanString(features.fullDrawIndexUint32));
+    printLn("Full draw index uint32", booleanString(features.fullDrawIndexUint32));
     printLn("Image cube array", booleanString(features.imageCubeArray));
     printLn("Independent blend", booleanString(features.independentBlend));
     printLn("Geometry shader", booleanString(features.geometryShader));
@@ -175,7 +175,7 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice)
     printLn("Max image dimension 1D", limits.maxImageDimension1D);
     printLn("Max image dimension 2D", limits.maxImageDimension2D);
     printLn("Max image dimension 3D", limits.maxImageDimension3D);
-    printLn("Max image dimension Cube", limits.maxImageDimensionCube);
+    printLn("Max image dimension cube", limits.maxImageDimensionCube);
     printLn("Max image array layers", limits.maxImageArrayLayers);
     printEndLn();
     printLn("Max texel buffer elements", uint32String(limits.maxTexelBufferElements));
@@ -742,8 +742,8 @@ void printAdvancedBlendOperationProperties(magma::PhysicalDevicePtr physicalDevi
     printEndLn();
     printLn("Advanced blend max color attachments", properties.advancedBlendMaxColorAttachments);
     printLn("Advanced blend independent blend", booleanString(properties.advancedBlendIndependentBlend));
-    printLn("Advanced blend non-premultiplied src color", booleanString(properties.advancedBlendNonPremultipliedSrcColor));
-    printLn("Advanced blend non-premultiplied dst color", booleanString(properties.advancedBlendNonPremultipliedDstColor));
+    printLn("Advanced blend non-premultiplied source color", booleanString(properties.advancedBlendNonPremultipliedSrcColor));
+    printLn("Advanced blend non-premultiplied dest color", booleanString(properties.advancedBlendNonPremultipliedDstColor));
     printLn("Advanced blend correlated overlap", booleanString(properties.advancedBlendCorrelatedOverlap));
     printLn("Advanced blend all operations", booleanString(properties.advancedBlendAllOperations));
 #endif // VK_EXT_blend_operation_advanced
