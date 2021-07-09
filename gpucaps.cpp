@@ -569,6 +569,16 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice)
 #endif // VK_NV_mesh_shader
 }
 
+void printShaderSMBuiltinsProperties(magma::PhysicalDevicePtr physicalDevice)
+{
+#ifdef VK_NV_shader_sm_builtins
+    const auto properties = physicalDevice->getShaderSMBuiltinsProperties();
+    printEndLn();
+    printLn("Shader streaming multiprocessor count", properties.shaderSMCount);
+    printLn("Shader warps per streaming multiprocessor", properties.shaderWarpsPerSM);
+#endif // VK_NV_shader_sm_builtins
+}
+
 void printInlineUniformBlockProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
@@ -874,6 +884,12 @@ int main()
             printHeading("Mesh Shader");
             setFieldWidth(40);
             printMeshShaderProperties(physicalDevice);
+        }
+        if (deviceExtensions->NV_shader_sm_builtins)
+        {
+            printHeading("Shader Streaming Multiprocessors");
+            setFieldWidth(45);
+            printShaderSMBuiltinsProperties(physicalDevice);
         }
         if (deviceExtensions->EXT_inline_uniform_block)
         {
