@@ -30,23 +30,23 @@ inline void printLn(const char *description, const Type& value)
 }
 
 template<typename Type>
-inline void printArray(const Type& arg)
+inline void printArgs(const Type& arg)
 {
     std::cout << arg;
 }
 
 template<typename Type, typename... Args>
-inline void printArray(const Type& arg, Args... args)
+inline void printArgs(const Type& arg, Args... args)
 {
     std::cout << arg << ", ";
-    printArray(args...);
+    printArgs(args...);
 }
 
 template<typename... Args>
 inline void printLn(const char *description, Args... args)
 {
     std::cout << std::setw(width) << std::left << description << "[";
-    printArray(args...);
+    printArgs(args...);
     std::cout << "]" << std::endl;
 }
 
