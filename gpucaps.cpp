@@ -235,9 +235,9 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice)
     printEndLn();
     printLn("Max compute shared memory size", limits.maxComputeSharedMemorySize);
     printLn("Max compute workgroup count",
-        limits.maxComputeWorkGroupCount[0],
-        limits.maxComputeWorkGroupCount[1],
-        limits.maxComputeWorkGroupCount[2]);
+        uint32String(limits.maxComputeWorkGroupCount[0]),
+        uint32String(limits.maxComputeWorkGroupCount[1]),
+        uint32String(limits.maxComputeWorkGroupCount[2]));
     printLn("Max compute workgroup invocations", limits.maxComputeWorkGroupInvocations);
     printLn("Max compute workgroup size",
         limits.maxComputeWorkGroupSize[0],
@@ -255,7 +255,9 @@ void printDeviceLimits(magma::PhysicalDevicePtr physicalDevice)
     printLn("Max sampler anisotropy", limits.maxSamplerAnisotropy);
     printEndLn();
     printLn("Max viewports", limits.maxViewports);
-    printLn("Max viewport dimensions", limits.maxViewportDimensions[0], limits.maxViewportDimensions[1]);
+    printLn("Max viewport dimensions",
+        uint32String(limits.maxViewportDimensions[0]),
+        uint32String(limits.maxViewportDimensions[1]));
     printLn("Viewport bounds range", limits.viewportBoundsRange[0], limits.viewportBoundsRange[1]);
     printLn("Viewport sub-pixel bits", limits.viewportSubPixelBits);
     printEndLn();
@@ -560,22 +562,22 @@ void printMeshShaderProperties(magma::PhysicalDevicePtr physicalDevice)
     printLn("Mesh shader", booleanString(features.meshShader));
     const auto properties = physicalDevice->getMeshShaderProperties();
     printEndLn();
-    printLn("Max draw mesh task count", properties.maxDrawMeshTasksCount);
+    printLn("Max draw mesh task count", uint32String(properties.maxDrawMeshTasksCount));
     printEndLn();
     printLn("Max task work group invocations", properties.maxTaskWorkGroupInvocations);
     printLn("Max task work group size",
         properties.maxTaskWorkGroupSize[0],
         properties.maxTaskWorkGroupSize[1],
         properties.maxTaskWorkGroupSize[2]);
-    printLn("Max task total memory size", properties.maxTaskTotalMemorySize);
-    printLn("Max task output count", properties.maxTaskOutputCount);
+    printLn("Max task total memory size", uint32String(properties.maxTaskTotalMemorySize));
+    printLn("Max task output count", uint32String(properties.maxTaskOutputCount));
     printEndLn();
     printLn("Max mesh work group invocations", properties.maxMeshWorkGroupInvocations);
     printLn("Max mesh work group size",
         properties.maxMeshWorkGroupSize[0],
         properties.maxMeshWorkGroupSize[1],
         properties.maxMeshWorkGroupSize[2]);
-    printLn("Max mesh total memory size", properties.maxMeshTotalMemorySize);
+    printLn("Max mesh total memory size", uint32String(properties.maxMeshTotalMemorySize));
     printLn("Max mesh output vertices", properties.maxMeshOutputVertices);
     printLn("Max mesh output primitives", properties.maxMeshOutputPrimitives);
     printLn("Max mesh multiview view count", properties.maxMeshMultiviewViewCount);
@@ -643,7 +645,7 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice)
     printLn("Runtime descriptor array", booleanString(features.runtimeDescriptorArray));
     const auto properties = physicalDevice->getDescriptorIndexingProperties();
     printEndLn();
-    printLn("Max update after bind descriptors in all pools", properties.maxUpdateAfterBindDescriptorsInAllPools);
+    printLn("Max update after bind descriptors in all pools", uint32String(properties.maxUpdateAfterBindDescriptorsInAllPools));
     printEndLn();
     printLn("Shader uniform buffer array non-uniform indexing native", booleanString(properties.shaderUniformBufferArrayNonUniformIndexingNative));
     printLn("Shader sampled image array non-uniform indexing native", booleanString(properties.shaderSampledImageArrayNonUniformIndexingNative));
@@ -660,7 +662,7 @@ void printDescriptorIndexingProperties(magma::PhysicalDevicePtr physicalDevice)
     printLn("Max per stage descriptor update after bind sampled images", properties.maxPerStageDescriptorUpdateAfterBindSampledImages);
     printLn("Max per stage descriptor update after bind storage images", properties.maxPerStageDescriptorUpdateAfterBindStorageImages);
     printLn("Max per stage descriptor update after bind input attachments", properties.maxPerStageDescriptorUpdateAfterBindInputAttachments);
-    printLn("Max per stage update after bind resources", properties.maxPerStageUpdateAfterBindResources);
+    printLn("Max per stage update after bind resources", uint32String(properties.maxPerStageUpdateAfterBindResources));
     printEndLn();
     printLn("Max descriptor set update after bind samplers", properties.maxDescriptorSetUpdateAfterBindSamplers);
     printLn("Max descriptor set update after bind uniform buffers", properties.maxDescriptorSetUpdateAfterBindUniformBuffers);
