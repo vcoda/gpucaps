@@ -449,7 +449,7 @@ void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice)
     printLn("Representative fragment test", booleanString(features.representativeFragmentTest));
     printLn("Exclusive scissor", booleanString(features.exclusiveScissor));
     printLn("Image footprint", booleanString(features.imageFootprint));
-    printLn("Shader streaming multiprocessors", booleanString(features.shaderSMBuiltins));
+    printLn("Shader streaming multiprocessor built-ins", booleanString(features.shaderSMBuiltins));
 }
 
 void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice)
@@ -868,7 +868,7 @@ int main()
         if (instanceExtensions->KHR_get_physical_device_properties2)
         {
             printHeading("Extension Features");
-            setFieldWidth(40);
+            setFieldWidth(45);
             printExtensionFeatures(physicalDevice);
         }
         if (deviceExtensions->KHR_8bit_storage)
@@ -954,7 +954,7 @@ int main()
         if (deviceExtensions->EXT_blend_operation_advanced)
         {
             printHeading("Advanced Blend Operation");
-            setFieldWidth(45);
+            setFieldWidth(50);
             printAdvancedBlendOperationProperties(physicalDevice);
         }
         if (deviceExtensions->NV_ray_tracing)
