@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <climits>
 
 static std::streamsize width = 0;

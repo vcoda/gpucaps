@@ -14,7 +14,7 @@ else
 	CFLAGS=$(BASE_CFLAGS) -O3 -DNDEBUG
 	MAGMA_LIB=magma
 endif
-LDFLAGS=$(LIBRARY_DIR) -l$(MAGMA_LIB) -lvulkan -lxcb
+LDFLAGS=$(LIBRARY_DIR) -l$(MAGMA_LIB) -lvulkan -lxcb -lpthread
 
 DEPS := $(OBJS:.o=.d)
 
