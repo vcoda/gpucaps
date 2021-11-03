@@ -1,6 +1,17 @@
 #include "gpucaps.h"
 #include "third-party/magma/magma.h"
 
+// https://www.reddit.com/r/vulkan/comments/4ta9nj/is_there_a_comprehensive_list_of_the_names_and/
+enum Vendor : uint16_t
+{
+    AMD = 0x1002,
+    ImaginationTechnologies = 0x1010,
+    NVidia = 0x10DE,
+    ARM = 0x13B5,
+    Qualcomm = 0x5143,
+    Intel = 0x8086
+};
+
 std::string apiVersionString(uint32_t apiVersion)
 {
     const uint32_t major = VK_VERSION_MAJOR(apiVersion);
@@ -16,7 +27,8 @@ std::string apiVersionString(uint32_t apiVersion)
 std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
 {
     // https://www.reddit.com/r/vulkan/comments/fmift4/how_to_decode_driverversion_field_of/
-    if (0x10DE == vendorID)
+    const uint16_t pciVendorID = vendorID & 0xFFFF;
+    if (Vendor::NVidia == pciVendorID)
     {   // NVIDIA
         const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
         const uint32_t minor = (driverVersion >> 14) & 0b11111111; // 8
@@ -26,7 +38,7 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
                std::to_string(minor) + "." +
                std::to_string(patch) + "." +
                std::to_string(build);
-    } else if (0x8086 == vendorID)
+    } else if (Vendor::Intel == pciVendorID)
     {   // Intel
         const uint32_t major = driverVersion >> 14;
         const uint32_t minor = driverVersion & 0b11111111111111; // 14
@@ -47,13 +59,13 @@ std::string vendorIDString(uint32_t vendorID)
 {
     const uint16_t pciVendorID = vendorID & 0xFFFF;
     switch (pciVendorID)
-    { // https://www.reddit.com/r/vulkan/comments/4ta9nj/is_there_a_comprehensive_list_of_the_names_and/
-    case 0x1002: return "AMD";
-    case 0x1010: return "ImgTec";
-    case 0x10DE: return "NVIDIA";
-    case 0x13B5: return "ARM";
-    case 0x5143: return "Qualcomm";
-    case 0x8086: return "Intel";
+    {
+    case Vendor::AMD: return "AMD";
+    case Vendor::ImaginationTechnologies: return "ImgTec";
+    case Vendor::NVidia: return "NVidia";
+    case Vendor::ARM: return "ARM";
+    case Vendor::Qualcomm: return "Qualcomm";
+    case Vendor::Intel: return "Intel";
     }
     return "Unknown";
 }
