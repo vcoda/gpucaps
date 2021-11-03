@@ -55,7 +55,7 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
     }
 }
 
-std::string vendorIDString(uint32_t vendorID)
+std::string vendorName(uint32_t vendorID)
 {
     const uint16_t pciVendorID = vendorID & 0xFFFF;
     switch (pciVendorID)
@@ -92,7 +92,7 @@ void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t dev
     printLn("API version", apiVersionString(properties.apiVersion));
     printLn("Driver version", driverVersionString(properties.driverVersion, properties.vendorID));
     std::cout << std::hex;
-    std::cout << std::setw(width) << std::left << "Vendor ID" << "0x" << properties.vendorID << " (" << vendorIDString(properties.vendorID) << ")" << std::endl;
+    std::cout << std::setw(width) << std::left << "Vendor ID" << "0x" << properties.vendorID << " (" << vendorName(properties.vendorID) << ")" << std::endl;
     std::cout << std::setw(width) << std::left << "Device ID" << "0x" << properties.deviceID << std::endl;
     std::cout << std::dec;
     printLn("Device type", magma::helpers::stringize(properties.deviceType));
