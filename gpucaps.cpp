@@ -98,13 +98,48 @@ void printDeviceProperties(magma::PhysicalDevicePtr physicalDevice, uint32_t dev
     printLn("Device type", magma::helpers::stringize(properties.deviceType));
 }
 
+#ifdef VK_KHR_driver_properties
+std::string driverIdString(VkDriverIdKHR driverID)
+{
+    switch (driverID)
+    {
+    case VK_DRIVER_ID_AMD_PROPRIETARY_KHR:
+        return "AMD PROPRIETARY";
+    case VK_DRIVER_ID_AMD_OPEN_SOURCE_KHR:
+        return "AMD OPEN SOURCE";
+    case VK_DRIVER_ID_MESA_RADV_KHR:
+        return "MESA RADV";
+    case VK_DRIVER_ID_NVIDIA_PROPRIETARY_KHR:
+        return "NVIDIA PROPRIETARY";
+    case VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS_KHR:
+        return "INTEL PROPRIETARY WINDOWS";
+    case VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA_KHR:
+        return "INTEL OPEN SOURCE MESA";
+    case VK_DRIVER_ID_IMAGINATION_PROPRIETARY_KHR:
+        return "IMAGINATION PROPRIETARY";
+    case VK_DRIVER_ID_QUALCOMM_PROPRIETARY_KHR:
+        return "QUALCOMM PROPRIETARY";
+    case VK_DRIVER_ID_ARM_PROPRIETARY_KHR:
+        return "ARM PROPRIETARY";
+    case VK_DRIVER_ID_GOOGLE_SWIFTSHADER_KHR:
+        return "GOOGLE SWIFTSHADER";
+    case VK_DRIVER_ID_GGP_PROPRIETARY_KHR:
+        return "GGP PROPRIETARY";
+    case VK_DRIVER_ID_BROADCOM_PROPRIETARY_KHR:
+        return "BROADCOM_PROPRIETARY";
+    default:
+        return "Unknown";
+    }
+}
+#endif // VK_KHR_driver_properties
+
 void printDriverProperties(magma::PhysicalDevicePtr physicalDevice)
 {
 #ifdef VK_KHR_driver_properties
     const auto properties = physicalDevice->getDriverProperties();
     const auto& conformanceVersion = properties.conformanceVersion;
     printEndLn();
-    printLn("Driver ID", properties.driverID);
+    printLn("Driver ID", driverIdString(properties.driverID));
     printLn("Driver name", properties.driverName);
     printLn("Driver info", properties.driverInfo);
     std::cout << std::setw(width) << std::left << "Conformance version"
