@@ -32,12 +32,12 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
     {   // NVIDIA
         const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
         const uint32_t minor = (driverVersion >> 14) & 0b11111111; // 8
-        const uint32_t patch = (driverVersion >> 6)  & 0b11111111; // 8
-        const uint32_t build = (driverVersion)       & 0b111111; // 6
+        const uint32_t subminor = (driverVersion >> 6) & 0b11111111; // 8
+        const uint32_t patch = (driverVersion) & 0b111111; // 6
         return std::to_string(major) + "." +
                std::to_string(minor) + "." +
-               std::to_string(patch) + "." +
-               std::to_string(build);
+               std::to_string(subminor) + "." +
+               std::to_string(patch);
     } else if (Vendor::Intel == pciVendorID)
     {   // Intel
         const uint32_t major = driverVersion >> 14;
@@ -48,10 +48,10 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
     {   // AMD & others
         const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
         const uint32_t minor = (driverVersion >> 12) & 0b1111111111; // 10
-        const uint32_t patch = (driverVersion)       & 0b111111111111; // 12
+        const uint32_t subminor = (driverVersion)    & 0b111111111111; // 12
         return std::to_string(major) + "." +
                std::to_string(minor) + "." +
-               std::to_string(patch);
+               std::to_string(subminor);
     }
 }
 
