@@ -102,15 +102,16 @@ void printDriverProperties(magma::PhysicalDevicePtr physicalDevice)
 {
 #ifdef VK_KHR_driver_properties
     const auto properties = physicalDevice->getDriverProperties();
+    const auto& conformanceVersion = properties.conformanceVersion;
     printEndLn();
     printLn("Driver ID", properties.driverID);
     printLn("Driver name", properties.driverName);
     printLn("Driver info", properties.driverInfo);
     std::cout << std::setw(width) << std::left << "Conformance version"
-        << (uint32_t)properties.conformanceVersion.major << "."
-        << (uint32_t)properties.conformanceVersion.minor << "."
-        << (uint32_t)properties.conformanceVersion.subminor << "."
-        << (uint32_t)properties.conformanceVersion.patch << std::endl;
+        << (uint16_t)conformanceVersion.major << "."
+        << (uint16_t)conformanceVersion.minor << "."
+        << (uint16_t)conformanceVersion.subminor << "."
+        << (uint16_t)conformanceVersion.patch << std::endl;
 #endif // VK_KHR_driver_properties
 }
 
