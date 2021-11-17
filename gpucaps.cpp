@@ -2,7 +2,7 @@
 #include "third-party/magma/magma.h"
 
 // https://www.reddit.com/r/vulkan/comments/4ta9nj/is_there_a_comprehensive_list_of_the_names_and/
-enum Vendor : uint16_t
+enum VendorId : uint16_t
 {
     AMD = 0x1002,
     ImaginationTechnologies = 0x1010,
@@ -28,8 +28,8 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
 {
     // https://www.reddit.com/r/vulkan/comments/fmift4/how_to_decode_driverversion_field_of/
     const uint16_t pciVendorID = vendorID & 0xFFFF;
-    if (Vendor::NVidia == pciVendorID)
-    {   // NVIDIA
+    if (VendorId::NVidia == pciVendorID)
+    {
         const uint32_t major = (driverVersion >> 22) & 0b1111111111; // 10
         const uint32_t minor = (driverVersion >> 14) & 0b11111111; // 8
         const uint32_t subminor = (driverVersion >> 6) & 0b11111111; // 8
@@ -38,8 +38,8 @@ std::string driverVersionString(uint32_t driverVersion, uint32_t vendorID)
                std::to_string(minor) + "." +
                std::to_string(subminor) + "." +
                std::to_string(patch);
-    } else if (Vendor::Intel == pciVendorID)
-    {   // Intel
+    } else if (VendorId::Intel == pciVendorID)
+    {
         const uint32_t major = driverVersion >> 14;
         const uint32_t minor = driverVersion & 0b11111111111111; // 14
         return std::to_string(major) + "." +
@@ -60,12 +60,12 @@ std::string vendorName(uint32_t vendorID)
     const uint16_t pciVendorID = vendorID & 0xFFFF;
     switch (pciVendorID)
     {
-    case Vendor::AMD: return "AMD";
-    case Vendor::ImaginationTechnologies: return "ImgTec";
-    case Vendor::NVidia: return "NVidia";
-    case Vendor::ARM: return "ARM";
-    case Vendor::Qualcomm: return "Qualcomm";
-    case Vendor::Intel: return "Intel";
+    case VendorId::AMD: return "AMD";
+    case VendorId::ImaginationTechnologies: return "ImgTec";
+    case VendorId::NVidia: return "NVidia";
+    case VendorId::ARM: return "ARM";
+    case VendorId::Qualcomm: return "Qualcomm";
+    case VendorId::Intel: return "Intel";
     }
     return "Unknown";
 }
