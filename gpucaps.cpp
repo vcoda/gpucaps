@@ -462,44 +462,6 @@ void printDeviceMemoryHeaps(magma::PhysicalDevicePtr physicalDevice)
     }
 }
 
-void printExtensionFeatures(magma::PhysicalDevicePtr physicalDevice)
-{
-    const auto features = physicalDevice->checkExtensionFeaturesSupport();
-    printEndLn();
-    printLn("Device coherent memory", booleanString(features.deviceCoherentMemory));
-    printLn("Advanced blend coherent operations", booleanString(features.advancedBlendCoherentOperations));
-    printLn("Depth clip enable", booleanString(features.depthClipEnable));
-    printLn("Extended dynamic state", booleanString(features.extendedDynamicState));
-    printLn("Host query reset", booleanString(features.hostQueryReset));
-    printLn("Robust image access", booleanString(features.robustImageAccess));
-    printLn("Index type uint8", booleanString(features.indexTypeUint8));
-    printLn("Memory priority", booleanString(features.memoryPriority));
-    printLn("Pipeline creation cache control", booleanString(features.pipelineCreationCacheControl));
-    printLn("Private data", booleanString(features.privateData));
-    printLn("Scalar block layout", booleanString(features.scalarBlockLayout));
-    printLn("Shader demote to helper invocation", booleanString(features.shaderDemoteToHelperInvocation));
-    printLn("Texel buffer alignment", booleanString(features.texelBufferAlignment));
-    printLn("YCbCr image arrays", booleanString(features.ycbcrImageArrays));
-    printLn("Imageless framebuffer", booleanString(features.imagelessFramebuffer));
-    printLn("Pipeline executable info", booleanString(features.pipelineExecutableInfo));
-    printLn("Sampler YCbCr conversion", booleanString(features.samplerYcbcrConversion));
-    printLn("Separate depth stencil layouts", booleanString(features.separateDepthStencilLayouts));
-    printLn("Shader draw parameters", booleanString(features.shaderDrawParameters));
-    printLn("Shader subgroup extended types", booleanString(features.shaderSubgroupExtendedTypes));
-    printLn("Shader terminate invocation", booleanString(features.shaderTerminateInvocation));
-    printLn("Timeline semaphore", booleanString(features.timelineSemaphore));
-    printLn("Uniform buffer standard layout", booleanString(features.uniformBufferStandardLayout));
-    printLn("Corner sampled image", booleanString(features.cornerSampledImage));
-    printLn("Coverage reduction mode", booleanString(features.coverageReductionMode));
-    printLn("Dedicated allocation image aliasing", booleanString(features.dedicatedAllocationImageAliasing));
-    printLn("Diagnostics config", booleanString(features.diagnosticsConfig));
-    printLn("Fragment shader barycentric", booleanString(features.fragmentShaderBarycentric));
-    printLn("Representative fragment test", booleanString(features.representativeFragmentTest));
-    printLn("Exclusive scissor", booleanString(features.exclusiveScissor));
-    printLn("Image footprint", booleanString(features.imageFootprint));
-    printLn("Shader streaming multiprocessor built-ins", booleanString(features.shaderSMBuiltins));
-}
-
 void print8BitStorageProperties(magma::PhysicalDevicePtr physicalDevice)
 {
     MAGMA_UNUSED(physicalDevice);
@@ -862,7 +824,8 @@ magma::InstancePtr createInstance(std::shared_ptr<magma::InstanceLayers> instanc
         extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
     if (instanceExtensions->KHR_device_group_creation)
         extensions.push_back(VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME);
-    return std::make_shared<magma::Instance>("gpucaps", "magma", VK_API_VERSION_1_0, layerNames, extensions);
+    magma::Application applicationInfo("gpucaps", 1, "magma", 1, VK_API_VERSION_1_0);
+    return std::make_shared<magma::Instance>(layerNames, extensions, nullptr, &applicationInfo);
 }
 
 int main()
@@ -887,7 +850,7 @@ int main()
         setFieldWidth(30);
         printDeviceGroups(instance);
     }
-    const uint32_t physicalDeviceCount = instance->countPhysicalDevices();
+    const uint32_t physicalDeviceCount = instance->enumeratePhysicalDevices();
     for (uint32_t deviceId = 0; deviceId < physicalDeviceCount; ++deviceId)
     {
         magma::PhysicalDevicePtr physicalDevice = instance->getPhysicalDevice(deviceId);
@@ -913,12 +876,6 @@ int main()
         printDeviceMemoryTypes(physicalDevice);
         printHeading("Device Memory Heaps");
         printDeviceMemoryHeaps(physicalDevice);
-        if (instanceExtensions->KHR_get_physical_device_properties2)
-        {
-            printHeading("Extension Features");
-            setFieldWidth(45);
-            printExtensionFeatures(physicalDevice);
-        }
         if (deviceExtensions->KHR_8bit_storage)
         {
             printHeading("8-bit Storage");
